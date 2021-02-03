@@ -45,6 +45,14 @@ df_trees$year <- year(df_trees$date) ## year function is from lubridate package
 ```
 
 
+```{r}
+df_trees %>%
+  select(year)%>%
+  arrange(year) %>%
+  head(n=5)
+  
+```
+
 
 Check the percentage of the complete cases in each column
 
