@@ -10,6 +10,8 @@ Libraries that are used
 ```{r}
 #install.packages('dplyr')
 library(dplyr)
+#install.package('lubridate')
+library(lubridate)
 ```
 
 
@@ -28,12 +30,20 @@ str(df_trees)
 
 The data type of date column is changed. 
 ```{r}
-df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d")
+df_trees$date <- as.POSIXlt(df_trees$date,format="%Y-%m-%d")
 ```
 
 ```{r}
 class(df_trees$date)
 ```
+
+
+save the planted year of the tree as a separate column
+
+```{r}
+df_trees$year <- year(df_trees$date) ## year function is from lubridate package
+```
+
 
 
 Check the percentage of the complete cases in each column
