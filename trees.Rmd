@@ -35,6 +35,17 @@ df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d")
 class(df_trees$date)
 ```
 
+
+Check the percentage of the complete cases in each column
+
+```{r}
+for (col in colnames(df_trees)){
+  print(paste(col, "=", mean(complete.cases(df_trees[[col]]))))
+}
+```
+
+
+
 Get the number of unique species
 ```{r}
 length(unique(df_trees$species))
