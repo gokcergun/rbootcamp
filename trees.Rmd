@@ -1,0 +1,54 @@
+---
+title: "Trees"
+author: "Gökce Ergün"
+date: "2/3/2021"
+output: html_document
+---
+
+Libraries that are used
+```{r}
+#install.packages('dplyr')
+library(dplyr)
+```
+
+
+
+Reading the data
+```{r}
+df_trees <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+```
+
+
+Look at the data structure
+
+```{r}
+str(df_trees)
+```
+
+The data type of date column is changed. 
+```{r}
+df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d")
+```
+
+```{r}
+class(df_trees$date)
+```
+
+Get the number of unique species
+```{r}
+length(unique(df_trees$species))
+```
+
+
+```{r}
+head(unique(df_trees$species))
+
+```
+
+Separate the species column into two
+```{r}
+df_trees <- separate(df_trees, species, sep = " :: ", remove = FALSE, into = c('species_lat, species_nor'))
+```
+
+
+
