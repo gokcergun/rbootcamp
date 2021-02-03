@@ -28,6 +28,15 @@ Look at the data structure
 str(df_trees)
 ```
 
+Check the percentage of the complete cases in each column
+
+```{r}
+for (col in colnames(df_trees)){
+  print(paste(col, "=", mean(complete.cases(df_trees[[col]]))))
+}
+```
+
+
 The data type of date column is changed. 
 ```{r}
 df_trees$date <- as.POSIXlt(df_trees$date,format="%Y-%m-%d")
@@ -49,17 +58,8 @@ df_trees$year <- year(df_trees$date) ## year function is from lubridate package
 df_trees %>%
   select(year)%>%
   arrange(year) %>%
-  head(n=5)
+  head()
   
-```
-
-
-Check the percentage of the complete cases in each column
-
-```{r}
-for (col in colnames(df_trees)){
-  print(paste(col, "=", mean(complete.cases(df_trees[[col]]))))
-}
 ```
 
 
@@ -77,8 +77,25 @@ head(unique(df_trees$species))
 
 Separate the species column into two
 ```{r}
-df_trees <- separate(df_trees, species, sep = " :: ", remove = FALSE, into = c('species_lat, species_nor'))
+df_trees <- df_trees %>% 
+  separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
 ```
 
 
+
+```{r}
+length(unique(df_trees$species_lat))
+length(unique(df_trees$species_nor))
+```
+
+Count the species
+
+```{r}
+df_trees %>%
+  count(species_lat) %>%
+  arrange(desc(n))
+```
+
+```{r}
+```
 
