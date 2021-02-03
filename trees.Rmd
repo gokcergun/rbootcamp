@@ -92,10 +92,15 @@ Count the species
 
 ```{r}
 df_trees %>%
-  count(species_lat) %>%
+  count(species_nor) %>%
   arrange(desc(n))
 ```
 
+Show number of distinct species in a street
+
 ```{r}
+by_address <- df_trees %>%
+  group_by(address) %>%
+  summarize(n_distinct(species_lat))
 ```
 
