@@ -12,6 +12,7 @@ Libraries that are used
 library(dplyr)
 #install.package('lubridate')
 library(lubridate)
+library(tidyr)
 ```
 
 
@@ -95,6 +96,17 @@ df_trees %>%
   count(species_nor) %>%
   arrange(desc(n))
 ```
+
+
+
+```{r}
+df_trees %>%
+  count(species_nor) %>%
+  top_n(n = 10)
+```
+
+
+
 
 Show number of distinct species in a street
 
