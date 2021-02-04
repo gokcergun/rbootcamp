@@ -14,6 +14,7 @@ library(dplyr)
 library(lubridate)
 #install.package('tidyr')
 library(tidyr)
+library(ggplot2)
 ```
 
 
@@ -64,7 +65,7 @@ length(unique(df_na_date$species))
 
 date column has char data type. We change it to date. 
 ```{r}
-df_trees$date <- as.POSIXlt(df_trees$date,format="%Y-%m-%d")
+df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d")
 ```
 
 ```{r}
@@ -76,15 +77,26 @@ save the planted year of the tree as a separate column
 
 ```{r}
 df_trees$year <- year(df_trees$date) ## year function is from lubridate package
+class(df_trees$year)
 ```
 
 
 ```{r}
 df_trees %>%
   select(year)%>%
-  arrange(year) %>%
+  arrange() %>%
   head()
   
+```
+```{r}
+
+df_trees <- df_trees %>% 
+  mutate(age = year(Sys.Date())-year)
+
+
+hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblue2')
+
+
 ```
 
 
@@ -126,6 +138,7 @@ df_trees %>%
 ```{r}
 df_trees %>%
   count(species_nor) %>%
+  arrange(desc(n)) %>%
   top_n(n = 10)
 ```
 
