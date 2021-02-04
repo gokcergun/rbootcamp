@@ -12,6 +12,7 @@ Libraries that are used
 library(dplyr)
 #install.package('lubridate')
 library(lubridate)
+#install.package('tidyr')
 library(tidyr)
 ```
 
@@ -19,7 +20,12 @@ library(tidyr)
 
 Reading the data
 ```{r}
-df_trees <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+df_trees_orig <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+
+```
+
+```{r}
+df_trees <- df_trees_orig
 ```
 
 
@@ -28,6 +34,17 @@ Look at the data structure
 ```{r}
 str(df_trees)
 ```
+Changing columns with type character to type factor
+```{r}
+
+for (i in 1:12){ 
+  if (is.character(df_trees[[i]]) == TRUE) {
+    df_trees[[i]]<-as.factor(df_trees[[i]])
+  }
+  }
+
+```
+
 
 Check the percentage of the complete cases in each column
 
