@@ -46,16 +46,23 @@ for (i in 1:12){
 ```
 
 
-Check the percentage of the complete cases in each column
+Check the percentage of missing values in each column
 
 ```{r}
 for (col in colnames(df_trees)){
-  print(paste(col, "=", mean(complete.cases(df_trees[[col]]))))
+  print(paste(col, "=", mean(is.na(df_trees[[col]])))) #mean takes percentage here because adds up all TRUES (since their value is 1)
+                                                       #and divides by total number of values (TRUE + FALSE)
 }
 ```
+checking if date data is missing at random or for particular species cohort.
+```{r}
+df_na_date <- df_trees %>% filter(is.na(date)) %>% 
+  select(c(date, species))  
+length(unique(df_na_date$species))
 
+```
 
-The data type of date column is changed. 
+date column has char data type. We change it to date. 
 ```{r}
 df_trees$date <- as.POSIXlt(df_trees$date,format="%Y-%m-%d")
 ```
