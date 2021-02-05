@@ -153,3 +153,29 @@ by_address <- df_trees %>%
   summarize(n_distinct(species_lat))
 ```
 
+
+```{r}
+unique(df_trees[grep(df_trees$species, pattern = "Acacia", ignore.case = TRUE), 'species'])
+
+```
+
+
+
+
+- most planted species in each decade 
+  - na.omit - the observations that has an age
+  
+- map shows the top 5(/10) most planted species on a map
+
+- another map with rare (n=1/below 5) species 
+
+
+
+
+
+
+
+
+
+
+
