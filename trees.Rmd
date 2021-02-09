@@ -7,7 +7,7 @@ output: html_document
 Hello world
 
 Libraries that are used
-```{r}
+```{r, warning=FALSE}
 #install.packages('dplyr')
 library(dplyr)
 #install.package('lubridate')
@@ -21,29 +21,36 @@ library(ggplot2)
 
 Reading the data
 ```{r}
-df_trees_orig <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+df_trees <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
 
 ```
 
+We create a copy of data to preserve its original form in case we want to look at it for reference
 ```{r}
 df_trees <- df_trees_orig
 ```
 
 
-Look at the data structure
-
+We look at the data structure, and see all the string variables are saved as char. We would rather have them as factors for potential modelling use.
 ```{r}
 str(df_trees)
 ```
-Changing columns with type character to type factor
+
+Changing columns with type character to type factor. you need double brackets because single bracket indexing returns a df object,
+which always evaluates to FALSE. Double brackets returns you the column as a vector whose data type can be tested. Alternatively, we can use single brackets but explicitly calling all rows and columns i.e [,i]
 ```{r}
 
 for (i in 1:12){ 
-  if (is.character(df_trees[[i]]) == TRUE) {
-    df_trees[[i]]<-as.factor(df_trees[[i]])
+    if (is.character(df_trees[,i]) == TRUE) {
+    df_trees[,i]<-as.factor(df_trees[,i])
   }
   }
 
+```
+
+check the changes worked
+```{r}
+str(df_trees)
 ```
 
 
@@ -55,19 +62,24 @@ for (col in colnames(df_trees)){
                                                        #and divides by total number of values (TRUE + FALSE)
 }
 ```
-checking if date data is missing at random or for particular species cohort.
-```{r}
-df_na_date <- df_trees %>% filter(is.na(date)) %>% 
-  select(c(date, species))  
-length(unique(df_na_date$species))
+Column with most significant amount of missing data is the date column.
 
+We see almost every species has missing values (517 out of 571 species) so there is at least no clear indication that the data is missing not at random.
+```{r}
+df_trees %>% filter(is.na(date))%>%
+  select(species)%>%
+  unique() %>% dim()
+ 
 ```
 
 date column has char data type. We change it to date. 
 ```{r}
-df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d")
+df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base 
+
+# df_trees$date <- lubridate::ymd(df_trees$date) #using lubridate
 ```
 
+check if change worked
 ```{r}
 class(df_trees$date)
 ```
@@ -76,18 +88,22 @@ class(df_trees$date)
 save the planted year of the tree as a separate column
 
 ```{r}
-df_trees$year <- year(df_trees$date) ## year function is from lubridate package
+# df_trees$year <- format(df_trees$date, "%Y")  #using base r
+df_trees$year <- year(df_trees$date) # using lubridate
 class(df_trees$year)
 ```
 
-
+checking year of plantation of oldest trees
 ```{r}
 df_trees %>%
   select(year)%>%
-  arrange() %>%
-  head()
+  arrange() %>%  #ascending by default. function belongs to dplyr package
+  head(10)
   
 ```
+
+Create a new column that shows age using the year column to calculate it. Use the more modern approach mutate(). Then use age column 
+to get an overview of the distribution of tree ages via a histogram.
 ```{r}
 
 df_trees <- df_trees %>% 
@@ -98,21 +114,15 @@ hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblu
 
 
 ```
-
-
-
-Get the number of unique species
-```{r}
-length(unique(df_trees$species))
-```
-
-
+take a look at the format of species name in species column. 
 ```{r}
 head(unique(df_trees$species))
 
 ```
+we see that for each **species**, the species column reports both the latin and common names. For future analysis, it might be more 
+convenient to split the latin and common names into respective columns. 
 
-Separate the species column into two
+Separate the species column into latin and common name columns.
 ```{r}
 df_trees <- df_trees %>% 
   separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
