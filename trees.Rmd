@@ -21,7 +21,7 @@ library(ggplot2)
 
 Reading the data
 ```{r}
-df_trees <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+df_trees_orig <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
 
 ```
 
@@ -62,7 +62,7 @@ for (col in colnames(df_trees)){
                                                        #and divides by total number of values (TRUE + FALSE)
 }
 ```
-Column with most significant amount of missing data is the date column.
+Column with most significant amount of missing data is the **date** column.
 
 We see almost every species has missing values (517 out of 571 species) so there is at least no clear indication that the data is missing not at random.
 ```{r}
@@ -72,11 +72,40 @@ df_trees %>% filter(is.na(date))%>%
  
 ```
 
+further analysis of missing date values: check number of missing date values per species (top 20)
+```{r}
+df_trees_datena <- df_trees %>% filter(is.na(date)) %>% 
+  select(c(species, date)) %>%
+  count(species)
+  
+
+df_trees_species_count <- df_trees %>% count(species)
+
+df_trees_merge <- dplyr::left_join(df_trees_species_count, df_trees_datena, by="species", suffix = c("total", "date.na"))
+df_trees_merge$percent.missing <- df_trees_merge$ndate.na / df_trees_merge$ntotal
+df_trees_merge %>%
+  arrange(desc(ntotal), desc(percent.missing))
+  
+
+
+
+```
+
+check number of date values per species 
+```{r}
+df_trees %>% filter(!is.na(date)) %>% 
+  select(c(species, date)) %>%
+  count(species) %>%
+  arrange(desc(n)) %>% 
+  top_n(20)
+```
+
+
 date column has char data type. We change it to date. 
 ```{r}
-df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base 
+# df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base r
 
-# df_trees$date <- lubridate::ymd(df_trees$date) #using lubridate
+df_trees$date <- lubridate::ymd(df_trees$date) #using lubridate
 ```
 
 check if change worked
@@ -89,6 +118,7 @@ save the planted year of the tree as a separate column
 
 ```{r}
 # df_trees$year <- format(df_trees$date, "%Y")  #using base r
+
 df_trees$year <- year(df_trees$date) # using lubridate
 class(df_trees$year)
 ```
@@ -110,10 +140,15 @@ df_trees <- df_trees %>%
   mutate(age = year(Sys.Date())-year)
 
 
-hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblue2')
-
+hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblue2') # using base r
 
 ```
+```{r}
+ggplot(df_trees)+geom_histogram()
+```
+
+
+
 take a look at the format of species name in species column. 
 ```{r}
 head(unique(df_trees$species))
