@@ -10,11 +10,18 @@ Libraries that are used
 ```{r, warning=FALSE}
 #install.packages('dplyr')
 library(dplyr)
-#install.package('lubridate')
+#install.packages('lubridate')
 library(lubridate)
-#install.package('tidyr')
+#install.packages('tidyr')
 library(tidyr)
 library(ggplot2)
+library(tidyverse)
+#install.packages('gganimate')
+library(gganimate)
+#install.packages('gifski')
+#install.packages('av')
+library(gifski)
+library(av)
 ```
 
 
@@ -204,12 +211,74 @@ unique(df_trees[grep(df_trees$species, pattern = "Acacia", ignore.case = TRUE), 
 
 To do this specific analysis we drop the trees, which have missing date data for obvious reasons. Based on our missing date data analysis in the data cleaning section, we are confident the data does not display any obvious signs of MNAR. 
 
+Selected related columns
+
 ```{r}
-df_trees_hasdate <- na.omit(df_trees, cols="date")
+df_trees_hasdate <- df_trees %>% 
+  filter(!is.na(date)) %>% 
+  select(c("tree_id", "species_lat", "year"))
+
+str(df_trees_hasdate)
+```
+  
+```{r}
+df_trees_hasdate$species_lat <- as.factor(df_trees_hasdate$species_lat)
 str(df_trees_hasdate)
 ```
 
-  
+
+
+```{r}
+df_trees_hasdate %>%
+  group_by(year) %>%
+  count(species_lat) %>%
+  arrange(year, desc(n)) %>%
+  top_n(n = 20)
+```
+
+```{r}
+unique(df_trees_hasdate[grep(df_trees_hasdate$species_lat, pattern = "^Acacia", ignore.case = TRUE), 'species_lat'])
+```
+
+
+```{r}
+unique(df_trees_hasdate[grep(df_trees_hasdate$species_lat, pattern = "^Magnolia", ignore.case = TRUE), 'species_lat'])
+```
+
+
+```{r}
+unique(df_trees_hasdate[grep(df_trees_hasdate$species_lat, pattern = "^Corymbia", ignore.case = TRUE), 'species_lat'])
+```
+
+
+```{r}
+unique(df_trees_hasdate[grep(df_trees_hasdate$species_lat, pattern = "^Pittosporum", ignore.case = TRUE), 'species_lat'])
+```
+
+
+Data Manipulation:
+
+In this step, We’re going to filter our dataset to retain only the top 10 planted species for every given year. 
+
+
+We’ll also create a few more columns that will help us display labels in the plot.
+
+```{r}
+#### code from website
+df_trees_hasdate_formated <- df_trees_hasdate %>%
+  group_by(species_lat) %>%
+  # The * 1 makes it possible to have non-integer ranks while sliding
+  mutate(rank = rank(-value),
+         Value_rel = value/value[rank==1],
+         Value_lbl = paste0(" ",round(value/1e9))) %>%
+  group_by(country_name) %>% 
+  filter(rank <=10) %>%
+  ungroup()
+```
+
+
+
+
   
   
   
