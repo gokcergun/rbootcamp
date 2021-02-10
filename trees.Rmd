@@ -88,7 +88,7 @@ df_trees_merge %>%
 
 ```
 ```{r}
-ggplot(df_trees_merge, aes(percent.missing))+geom_histogram(aes(y=..density..))
+ggplot(df_trees_merge, aes(percent.missing))+geom_histogram(aes(y=..density..)) #using ggplot2
 ```
 
 check number of **date** values per species 
@@ -143,9 +143,7 @@ df_trees <- df_trees %>%
 hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblue2') # using base r
 
 ```
-```{r}
-ggplot(df_trees)+geom_histogram()
-```
+
 
 
 
