@@ -87,9 +87,32 @@ df_trees_merge %>%
   arrange(desc(ntotal), desc(percent.missing))
 
 ```
+
+
+We look at the total number of observations we would lose if we drop species where missing 100% of date information. And the number is very small relative to total number of observations (n = 192987) 
+
 ```{r}
-ggplot(df_trees_merge, aes(percent.missing))+geom_histogram(aes(y=..density..))
+df_trees_merge %>% filter(percent.missing==1) %>% select(ntotal) %>%
+  sum()
+  #arrange(desc(percent.missing), desc(ntotal))
 ```
+
+How the percentage of missing date values per species is distributed. All species that have 100% of date data missing have a very low number of observations (n <=100).    
+
+```{r}
+df_trees_merge %>% 
+  ggplot(aes(percent.missing))+geom_histogram() +scale_x_continuous(breaks=seq(0,1, .10))
+
+```
+
+
+Therefore, we now filter the cases based on this 100 ntotal threshold. 
+```{r}
+df_trees_merge %>% filter(ntotal>100) %>%
+  ggplot(aes(percent.missing))+geom_histogram() +scale_x_continuous(breaks=seq(0,1, .10))
+```
+
+
 
 check number of **date** values per species 
 ```{r}
@@ -188,8 +211,6 @@ df_trees %>%
 ```
 
 
-
-
 Show number of distinct species in a street
 
 ```{r}
@@ -208,7 +229,9 @@ unique(df_trees[grep(df_trees$species, pattern = "Acacia", ignore.case = TRUE), 
 
 
 - most planted species in each decade 
-  - na.omit - the observations that has an age
+  - na.omit - the observations that has an age  -  75000 obs
+  
+
   
 - map shows the top 5(/10) most planted species on a map
 
