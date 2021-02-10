@@ -107,6 +107,7 @@ df_trees_merge %>%
 
 
 Therefore, we now filter the cases based on this 100 ntotal threshold. 
+
 ```{r}
 df_trees_merge %>% filter(ntotal>100) %>%
   ggplot(aes(percent.missing))+geom_histogram() +scale_x_continuous(breaks=seq(0,1, .10))
