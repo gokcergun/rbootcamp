@@ -19,7 +19,7 @@ library(ggplot2)
 
 
 
-Reading the data
+# Reading the data
 ```{r}
 df_trees_orig <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
 
@@ -30,6 +30,7 @@ We create a copy of data to preserve its original form in case we want to look a
 df_trees <- df_trees_orig
 ```
 
+# Data Cleaning 
 
 We look at the data structure, and see all the string variables are saved as char. We would rather have them as factors for potential modelling use.
 ```{r}
@@ -48,11 +49,45 @@ for (i in 1:12){
 
 ```
 
-check the changes worked
-```{r}
+<!--check the changes worked-->
+
+```{r, include=FALSE}
 str(df_trees)
+``` 
+
+date column has char data type. We change it to date. 
+```{r}
+# df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base r
+
+df_trees$date <- lubridate::ymd(df_trees$date) #using lubridate
 ```
 
+save the planted year of the tree as a separate column
+```{r}
+# df_trees$year <- format(df_trees$date, "%Y")  #using base r
+
+df_trees$year <- year(df_trees$date) # using lubridate
+class(df_trees$year)
+```
+
+take a look at the format of species name in species column. 
+```{r}
+head(unique(df_trees$species))
+
+```
+we see that for each **species**, the species column reports both the latin and common names. For future analysis, it might be more 
+convenient to split the latin and common names into respective columns. 
+
+Separate the species column into latin and common name columns.
+```{r}
+df_trees <- df_trees %>% 
+  separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
+```
+
+<!--check the name split worked-->
+```{r, include=FALSE}
+head(df_trees[,c('species','species_lat','species_nor')])
+```
 
 Check the percentage of missing values in each column
 
@@ -87,7 +122,7 @@ df_trees_merge %>%
   arrange(desc(ntotal), desc(percent.missing))
 
 ```
-<<<<<<< HEAD
+
 
 
 We look at the total number of observations we would lose if we drop species where missing 100% of date information. And the number is very small relative to total number of observations (n = 192987) 
@@ -107,7 +142,7 @@ df_trees_merge %>%
 ```
 
 
-Therefore, we now filter the cases based on this 100 ntotal threshold. 
+Therefore, we now filter the cases based on this 100 ntotal threshold to get a cleaner histogram. 
 
 ```{r}
 df_trees_merge %>% filter(ntotal>100) %>%
@@ -115,44 +150,15 @@ df_trees_merge %>% filter(ntotal>100) %>%
 
 ```
 
-check number of **date** values per species 
-```{r}
-df_trees %>% filter(!is.na(date)) %>% 
-  select(c(species, date)) %>%
-  count(species) %>%
-  arrange(desc(n)) %>% 
-  top_n(20)
-```
 
+# Exploratory Analysis
 
-date column has char data type. We change it to date. 
-```{r}
-# df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base r
-
-df_trees$date <- lubridate::ymd(df_trees$date) #using lubridate
-```
-
-check if change worked
-```{r}
-class(df_trees$date)
-```
-
-
-save the planted year of the tree as a separate column
-
-```{r}
-# df_trees$year <- format(df_trees$date, "%Y")  #using base r
-
-df_trees$year <- year(df_trees$date) # using lubridate
-class(df_trees$year)
-```
-
-checking year of plantation of oldest trees
+Checking year of plantation range. most of the trees (50%) were planted between 2001 and 2020. However, it is likely that many of
+the older trees simply were not recorded so they either dont appear in our data or have a missing date value. 
 ```{r}
 df_trees %>%
   select(year)%>%
-  arrange() %>%  #ascending by default. function belongs to dplyr package
-  head(10)
+  quantile(na.rm = TRUE)
   
 ```
 
@@ -167,59 +173,25 @@ df_trees <- df_trees %>%
 hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblue2') # using base r
 
 ```
-```{r}
-ggplot(df_trees)+geom_histogram()
-```
 
 
 
-take a look at the format of species name in species column. 
-```{r}
-head(unique(df_trees$species))
-
-```
-we see that for each **species**, the species column reports both the latin and common names. For future analysis, it might be more 
-convenient to split the latin and common names into respective columns. 
-
-Separate the species column into latin and common name columns.
-```{r}
-df_trees <- df_trees %>% 
-  separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
-```
-
-
-
-```{r}
-length(unique(df_trees$species_lat))
-length(unique(df_trees$species_nor))
-```
 
 Count the species
-
 ```{r}
 df_trees %>%
-  count(species_nor) %>%
-  arrange(desc(n))
-```
-
-
-
-```{r}
-df_trees %>%
-  count(species_nor) %>%
+  count(species_lat) %>%
   arrange(desc(n)) %>%
-  top_n(n = 10)
+  top_n(n = 20)
 ```
-
-
-
 
 Show number of distinct species in a street
 
 ```{r}
-by_address <- df_trees %>%
+df_trees %>%
   group_by(address) %>%
-  summarize(n_distinct(species_lat))
+  summarize(n = n_distinct(species_lat)) %>%
+  arrange(desc(n))
 ```
 
 
@@ -228,14 +200,24 @@ unique(df_trees[grep(df_trees$species, pattern = "Acacia", ignore.case = TRUE), 
 
 ```
 
+# Analysis 1: evolution of planted species over time
 
+To do this specific analysis we drop the trees, which have missing date data for obvious reasons. Based on our missing date data analysis in the data cleaning section, we are confident the data does not display any obvious signs of MNAR. 
 
+```{r}
+df_trees_hasdate <- na.omit(df_trees, cols="date")
+str(df_trees_hasdate)
+```
 
-- most planted species in each decade 
-  - na.omit - the observations that has an age
   
+  
+  
+  
+#Analysis 2: 
 - map shows the top 5(/10) most planted species on a map
 
+
+#Analysis 3:
 - another map with rare (n=1/below 5) species 
 
 
