@@ -203,10 +203,6 @@ df_trees %>%
 ```
 
 
-```{r}
-unique(df_trees[grep(df_trees$species, pattern = "Acacia", ignore.case = TRUE), 'species'])
-
-```
 
 # Analysis 1: evolution of planted species over time
 
@@ -365,6 +361,8 @@ df_top5 <- df_trees_hasdate_tidy %>%
   filter(species_first == 'Prunus' | species_first == 'Tristaniopsis' | species_first == 'Lophostemon' | species_first == 'Magnolia' | species_first =='Arbutus')
 ```
 
+
+Calculate the cumulative summattion for each species. 
 ```{r}
 df_top5_cumsum <- df_top5 %>% 
   group_by(species_first) %>% 
@@ -372,25 +370,105 @@ df_top5_cumsum <- df_top5 %>%
 ```
 
 ```{r}
-species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + theme_minimal()
+#install.packages('transformr')
+library('transformr')
 ```
 
+
+Save the data type of **year** column as Date 
 ```{r}
-anim2 <- species_cumsum + transition_states(year, transition_length = 4, state_length = 1) + view_follow(fixed_x = TRUE)  +
-  labs(title = 'cumulative total of top 5 species over time: {closest_state}',  
-       subtitle  =  "Top 5 Species")
+df_top5_cumsum$year <- lubridate::ymd(df_top5_cumsum$year, truncated = 2L)
 ```
+
+
+Create the static plot
+```{r}
+species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00')) + theme_minimal() 
+                                                                                      
+```
+
+
+Create the animated plot with transition 
+```{r}
+anim2 <- species_cumsum + transition_reveal(year) + view_follow(fixed_x = TRUE)  +
+  labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum')
+```
+
+Animated graph (gif version): 
 
 ```{r}
 animate(anim2, 200, fps = 3,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
-```{r}
-df_top5_cumsum$year <- as.Date(df_top5_cumsum$year)
-```
+
   
 
 #Analysis 2: 
+
+Recommended Species (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
+
+
+```{r}
+recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
+                            ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia')
+```
+
+<!-- to check the naming -->
+```{r}
+length(df_trees[grep(df_trees$species_nor, pattern = "Little Gem Magnolia", ignore.case = TRUE), 'species'])
+
+```
+
+
+```{r}
+df_trees$species_nor <- as.factor(df_trees$species_nor)
+```
+
+
+```{r}
+df_trees_filtered <- df_trees %>% 
+  filter(species_nor %in% recommended_sp)
+```
+
+
+<!-- to check whether all recommended species are selected -->
+```{r}
+unique(df_trees_filtered$species_nor)
+```
+
+
+```{r}
+install.packages('sf')
+library(sf)
+```
+
+Add the coordinates of San Francisco and create a map
+
+```{r}
+sf <- c(lon = -122.3999, lat = 37.7846)
+map <- GetMap(center=sf, zoom=13)
+
+```
+
+
+
+```{r}
+sf <- c(lon = -122.3999, lat = 37.7846)
+map <- GetMap(center= sf)
+```
+
+
+
+```{r}
+class(map)
+```
+
+```{r}
+sanf_map <- ggmap(map) + geom_point(aes(longitude, latitude), data = df_trees) 
+```
+
+
+
 - map shows the top 5(/10) most planted species on a map
 
 
