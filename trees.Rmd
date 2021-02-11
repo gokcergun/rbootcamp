@@ -249,7 +249,7 @@ df_trees_hasdate <- df_trees_hasdate %>%
   separate(species_lat, sep = " ", remove = FALSE, into = c('species_first', 'species_second', 'species_third'))
 ```
 
-The below code show that the number of unique species after recategorize the species is 158.
+The code below shows that the number of unique species after recategorizing **species_lat** is 158.
 ```{r}
 length(unique(df_trees_hasdate$species_first))
 ```
@@ -284,11 +284,8 @@ In this step, We’re going to filter our dataset to retain only the top 10 plan
 ```{r}
 df_trees_hasdate_formated <- df_trees_hasdate_tidy %>%
   group_by(year) %>%
-  # The * 1 makes it possible to have non-integer ranks while sliding
   mutate(rank = rank(-n)) %>%
-  group_by(species_first) %>% 
-  filter(rank <=10) %>%
-  ungroup()
+  filter(rank <=10) 
 ```
 
 
@@ -336,7 +333,7 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
   
 For gif
 ```{r}
-animate(anim, 200, fps = 5,  width = 1200, height = 1000, 
+animate(anim, 200, fps = 2,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim.gif"))
 
 ```
@@ -349,9 +346,9 @@ anim_save("animation.mp4", animation = for_mp4 )
 
 ```
   
-## Alternative
+## Alternative: cumulative total of top 5 species over time
 
-Select the top 5 species with a planted data. 'Trees' category will be omitted
+find out which are the top 5 most planted species over entire time period. 'Trees' category will be omitted
 
 ```{r}
 df_agg <- aggregate(df_trees_hasdate_tidy$n, by=list(df_trees_hasdate_tidy$species_first), FUN='sum')
@@ -359,10 +356,10 @@ df_agg %>%
   arrange(desc(x)) %>%
   top_n(n=6)
 ```
-
+create df to be used for cum sum
 ```{r}
-selected_species = c('Prunus', 'Tristaniopsis', 'Lophostemon', 'Magnolia', 'Arbutus')
-
+df_top5 <- df_trees_hasdate_tidy %>%
+  filter(species_first == 'Prunus' | species_first == 'Tristaniopsis' | species_first == 'Lophostemon' | species_first == 'Magnolia' | species_first =='Arbutus')
 ```
 
 
