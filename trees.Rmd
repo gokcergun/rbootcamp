@@ -282,7 +282,6 @@ df_trees_hasdate_tidy %>%
 In this step, We’re going to filter our dataset to retain only the top 10 planted species for every given year. 
 
 ```{r}
-#### code from website
 df_trees_hasdate_formated <- df_trees_hasdate_tidy %>%
   group_by(year) %>%
   # The * 1 makes it possible to have non-integer ranks while sliding
@@ -350,6 +349,24 @@ anim_save("animation.mp4", animation = for_mp4 )
 
 ```
   
+## Alternative
+
+Select the top 5 species with a planted data. 'Trees' category will be omitted
+
+```{r}
+df_agg <- aggregate(df_trees_hasdate_tidy$n, by=list(df_trees_hasdate_tidy$species_first), FUN='sum')
+df_agg %>%
+  arrange(desc(x)) %>%
+  top_n(n=6)
+```
+
+```{r}
+selected_species = c('Prunus', 'Tristaniopsis', 'Lophostemon', 'Magnolia', 'Arbutus')
+
+```
+
+
+
   
 #Analysis 2: 
 - map shows the top 5(/10) most planted species on a map
