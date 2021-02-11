@@ -349,7 +349,8 @@ anim_save("animation.mp4", animation = for_mp4 )
   
 ## Alternative: cumulative total of top 5 species over time
 
-find out which are the top 5 most planted species over entire time period. 'Trees' category will be omitted
+find out which are the top 5 most planted species over entire time period. 'Trees' category will be omitted as it tells us nothing
+about species
 
 ```{r}
 df_agg <- aggregate(df_trees_hasdate_tidy$n, by=list(df_trees_hasdate_tidy$species_first), FUN='sum')
@@ -370,8 +371,25 @@ df_top5_cumsum <- df_top5 %>%
   mutate(csum = cumsum(n))
 ```
 
+```{r}
+species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + theme_minimal()
+```
 
+```{r}
+anim2 <- species_cumsum + transition_states(year, transition_length = 4, state_length = 1) + view_follow(fixed_x = TRUE)  +
+  labs(title = 'cumulative total of top 5 species over time: {closest_state}',  
+       subtitle  =  "Top 5 Species")
+```
+
+```{r}
+animate(anim2, 200, fps = 3,  width = 1200, height = 1000, 
+        renderer = gifski_renderer("gganim2.gif"))
+```
+```{r}
+df_top5_cumsum$year <- as.Date(df_top5_cumsum$year)
+```
   
+
 #Analysis 2: 
 - map shows the top 5(/10) most planted species on a map
 
