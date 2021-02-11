@@ -436,36 +436,33 @@ df_trees_filtered <- df_trees %>%
 unique(df_trees_filtered$species_nor)
 ```
 
-
 ```{r}
-install.packages('sf')
-library(sf)
+library(ggmap)
 ```
 
-Add the coordinates of San Francisco and create a map
+Get the coordinates of the whole dataset
 
 ```{r}
-sf <- c(lon = -122.3999, lat = 37.7846)
-map <- GetMap(center=sf, zoom=13)
-
-```
-
-
-
-```{r}
-sf <- c(lon = -122.3999, lat = 37.7846)
-map <- GetMap(center= sf)
-```
-
-
-
-```{r}
-class(map)
+df_trees_filtered %>% 
+  summarise(max_lon = max(longitude,  na.rm=TRUE), min_lon = min(longitude,  na.rm=TRUE),
+            max_lat = max(latitude,  na.rm=TRUE), min_lat = min(latitude,  na.rm=TRUE))
 ```
 
 ```{r}
-sanf_map <- ggmap(map) + geom_point(aes(longitude, latitude), data = df_trees) 
+register_google('AIzaSyB2pTXikWRKM3XgN4WC-p-Fu2mOs8fZK88')
 ```
+
+```{r}
+san_francisco = c(left=-122.7, bottom = 37.5, right = -122.3, top = 37.9)
+smap <- get_stamenmap(san_francisco, maptype = "watercolor") %>%
+  ggmap()
+```
+
+```{r fig.height=12, fig.width=12}
+smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor))
+
+```
+
 
 
 
