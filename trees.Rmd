@@ -3,6 +3,7 @@ title: "Trees"
 author: "Gökce Ergün"
 date: "2/3/2021"
 output: html_document
+
 ---
 Hello world
 
@@ -333,7 +334,7 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
   
 For gif
 ```{r}
-animate(anim, 200, fps = 2,  width = 1200, height = 1000, 
+animate(anim, 200, fps = 3,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim.gif"))
 
 ```
@@ -356,12 +357,18 @@ df_agg %>%
   arrange(desc(x)) %>%
   top_n(n=6)
 ```
-create df to be used for cum sum
+
+create df to be used for cumulative summation
 ```{r}
 df_top5 <- df_trees_hasdate_tidy %>%
   filter(species_first == 'Prunus' | species_first == 'Tristaniopsis' | species_first == 'Lophostemon' | species_first == 'Magnolia' | species_first =='Arbutus')
 ```
 
+```{r}
+df_top5_cumsum <- df_top5 %>% 
+  group_by(species_first) %>% 
+  mutate(csum = cumsum(n))
+```
 
 
   
