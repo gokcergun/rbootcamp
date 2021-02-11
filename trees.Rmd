@@ -15,14 +15,21 @@ library(dplyr)
 library(lubridate)
 #install.packages('tidyr')
 library(tidyr)
+#install.packages('ggplot2')
 library(ggplot2)
 library(tidyverse)
 #install.packages('gganimate')
 library(gganimate)
 #install.packages('gifski')
-#install.packages('av')
 library(gifski)
+#install.packages('av')
 library(av)
+#install.packages('ggmap')
+library(ggmap)
+#install.packages('shiny')
+library(shiny)
+#install.packages('leaflet')
+library(leaflet)
 ```
 
 
@@ -436,9 +443,6 @@ df_trees_filtered <- df_trees %>%
 unique(df_trees_filtered$species_nor)
 ```
 
-```{r}
-library(ggmap)
-```
 
 Get the coordinates of the whole dataset
 
@@ -453,16 +457,174 @@ register_google('AIzaSyB2pTXikWRKM3XgN4WC-p-Fu2mOs8fZK88')
 ```
 
 ```{r}
-san_francisco = c(left=-122.7, bottom = 37.5, right = -122.3, top = 37.9)
-smap <- get_stamenmap(san_francisco, maptype = "watercolor") %>%
+san_francisco = c(left=-122.7, bottom = 37.7, right = -122.3, top = 37.85)
+smap <- get_map(san_francisco, maptype = 'hybrid') %>% #get_stamenmap(san_francisco, maptype = 'watercolor')
   ggmap()
 ```
 
-```{r fig.height=12, fig.width=12}
-smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor))
+```{r}
+smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor)) + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'))
 
 ```
 
+Create a map with leaflet package
+```{r}
+#map center
+mlong = -122.4446
+mlat  = 37.75695
+
+leaflet(data = df_trees_filtered, 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        addCircleMarkers(lng = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$longitude, 
+                         lat = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$latitude,
+                         popup = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor,
+                         label = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor, 
+                         radius = 4)
+```
+
+
+Create a shiny app
+```{r}
+#map center
+mlong = -122.4446
+mlat  = 37.75695
+
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    # Application title
+    titlePanel("Trees of San Francisco"),
+
+    # Sidebar with a slider input for number of bins 
+    sidebarLayout(
+        # Input: Selector for choosing dataset ----
+        selectInput(inputId = "species_nor",
+                    label = "Choose a species:",
+                    choices = c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
+                                ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
+                    selected = ' Japanese Blueberry Tree'
+        ),
+
+        # Show a plot of the generated distribution
+        mainPanel(
+           plotOutput("map")
+        )
+  )
+)
+
+# Define server logic required to draw a histogram
+  server <- function(input, output) {
+    
+    output$map <- renderLeaflet({
+        
+        leaflet(data = df_trees_filtered, 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        addCircleMarkers(lng = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$longitude, 
+                         lat = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$latitude,
+                         popup = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor,
+                         label = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor, 
+                         radius = 4)
+    }
+    )
+}
+# Run the application 
+shinyApp(ui = ui, server = server)
+
+
+
+
+```
+
+```{r}
+##doesnt work
+
+#map center
+mlong = -122.4446
+mlat  = 37.75695
+
+shinyApp(
+  
+  # Define the UI
+  ui = fluidPage(
+    
+    # App title
+    titlePanel("Trees of San Francisco"),
+    
+    # Sidebar layout with input and output definitions
+    sidebarLayout(
+      
+      # Sidebar panel for inputs 
+      sidebarPanel(
+        
+        # First input: Type of data
+        selectInput(inputId = "species_nor",
+                    label = "Choose a species:",
+                    choices = c('All Species', ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
+                                ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
+                    selected = ' Japanese Blueberry Tree'
+      )),
+      
+      # Main panel for displaying outputs
+      mainPanel(
+        
+        # Hide errors
+        tags$style(type = "text/css",
+                   ".shiny-output-error { visibility: hidden; }",
+                   ".shiny-output-error:before { visibility: hidden; }"),
+        
+        # Output: interactive world map
+        plotOutput("map")
+        
+      )
+    )
+  ),
+  
+  # Define the server
+  server = function(input, output) {
+    
+    filteredData <- reactive({
+    if (input$species_nor == "All Species") {
+      df_trees_filtered
+    } else {
+      filter(df_trees_filtered, species == input$species_nor)
+    }
+  })
+    
+    output$map <- renderLeaflet({
+        
+        leaflet(filteredData(), 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        addCircleMarkers(lng =~longitude, 
+                         lat = ~latitude,
+                         popup = ~species_nor,
+                         #label = ~species_nor, 
+                         radius = 4)
+    }
+    )
+  },
+   
+  options = list(height = 600)
+  
+)
+
+```
+
+
+
+
+```{r}
+runExample("03_reactivity")
+```
 
 
 
