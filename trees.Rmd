@@ -302,7 +302,7 @@ staticplot = ggplot(df_trees_hasdate_formated, aes(rank, group = species_first,
                 height = n,
                 width = 0.9), alpha = 0.8, color = NA) +
   geom_text(aes(y = 0, label = paste(species_first, " ")), vjust = 0.2, hjust = 1) +
-  geom_text(aes(y=n,label = n, hjust=0)) +
+  geom_text(aes(y=n, label = n, hjust=0)) +
   coord_flip(clip = "off", expand = FALSE) +
   scale_y_continuous(labels = scales::comma) +
   scale_x_reverse() +
@@ -331,13 +331,13 @@ staticplot = ggplot(df_trees_hasdate_formated, aes(rank, group = species_first,
 ```{r}
 anim = staticplot + transition_states(year, transition_length = 4, state_length = 1) +
   view_follow(fixed_x = TRUE)  +
-  labs(title = 'Total Number of Planted Trees per Year : {year}',  
+  labs(title = 'Total Number of Planted Trees per Year: {closest_state}',  
        subtitle  =  "Top 10 Species")
 ```
   
 For gif
 ```{r}
-animate(anim, 200, fps = 20,  width = 1200, height = 1000, 
+animate(anim, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim.gif"))
 
 ```
@@ -345,7 +345,7 @@ animate(anim, 200, fps = 20,  width = 1200, height = 1000,
 For Video
 ```{r}
 # For MP4
-for_mp4 <- animate(anim, 200, fps = 10,  width = 1200, height = 1000, renderer = av_renderer()) 
+for_mp4 <- animate(anim, 200, fps = 5,  width = 1200, height = 1000, renderer = av_renderer()) 
 anim_save("animation.mp4", animation = for_mp4 )
 
 ```
