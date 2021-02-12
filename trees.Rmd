@@ -495,72 +495,72 @@ Create a shiny app
 mlong = -122.4446
 mlat  = 37.75695
 
-
+shinyApp(
   
-# Define the UI
-ui = fluidPage(
-    
-  # App title
-  titlePanel("Trees of San Francisco"),
-    
-  # Sidebar layout with input and output definitions
-  sidebarLayout(
+  # Define the UI
+  ui = fluidPage(
       
-    # Sidebar panel for inputs 
-    sidebarPanel(
-        
-      # First input: Type of data
-      selectInput(inputId = "species", #name of the input, widget
-                    label = "Choose a species:",
-                    choices = c('All Species', ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
-                                ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
-                    selected = ' Japanese Blueberry Tree'
-      )),
+    # App title
+    titlePanel("Trees of San Francisco"),
       
-    # Main panel for displaying outputs
-    mainPanel(
+    # Sidebar layout with input and output definitions
+    sidebarLayout(
         
-      # Hide errors
-      tags$style(type = "text/css",
-                   ".shiny-output-error { visibility: hidden; }",
-                   ".shiny-output-error:before { visibility: hidden; }"),
+      # Sidebar panel for inputs 
+      sidebarPanel(
+          
+        # First input: Type of data
+        selectInput(inputId = "species", #name of the input, widget
+                      label = "Choose a species:",
+                      choices = c('All Species', ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
+                                  ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
+                      selected = ' Japanese Blueberry Tree'
+        )),
         
-      # Output: interactive world map
-      plotOutput("map")
-        
+      # Main panel for displaying outputs
+      mainPanel(
+          
+        # Hide errors
+        tags$style(type = "text/css",
+                     ".shiny-output-error { visibility: hidden; }",
+                     ".shiny-output-error:before { visibility: hidden; }"),
+          
+        # Output: interactive world map
+        plotOutput("map")
+          
+        )
       )
-    )
-  )
-  
-# Define the server
-server = function(input, output) {
-  
-  filteredData <- reactive({
-    if (input$species == "All Species") {
-      df_trees_filtered
-    } else {
-      filter(df_trees_filtered, species_nor == input$species)
-    }
-  })
+    ),
     
-  output$map <- renderLeaflet({
-        
-      leaflet(filteredData(), 
-              width = '100%', 
-              options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
-      addTiles() %>%
-      setView(lng = mlong, lat = mlat, zoom = 11) %>%
-      addCircleMarkers(lng = filteredData()$longitude, 
-                         lat = filteredData()$latitude,
-                         popup = filteredData()$species_nor,
-                         #label = ~species_nor, 
-                         radius = 4)
-  })
-}
- 
+  # Define the server
+  server = function(input, output) {
+    
+    filteredData <- reactive({
+      if (input$species == "All Species") {
+        df_trees_filtered
+      } else {
+        filter(df_trees_filtered, species_nor == input$species)
+      }
+    })
+      
+    output$map <- renderLeaflet({
+          
+        leaflet(filteredData(), 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        addCircleMarkers(lng = filteredData()$longitude, 
+                           lat = filteredData()$latitude,
+                           popup = filteredData()$species_nor,
+                           #label = ~species_nor, 
+                           radius = 4)
+    })
+  }
+)
   
 
-shinyApp(ui, server)
+
 ```
 
 
