@@ -416,13 +416,17 @@ Recommended Species (https://sfenvironment.org/sites/default/files/fliers/files/
 
 
 ```{r}
-recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
-                            ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia')
+recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', ' Flowering Cherry', 
+                    ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', ' Hybrid Strawberry Tree', 
+                    ' Primrose Tree', ' Brisbane Box', ' Mediterranean Fan Palm', ' Fruitless Olive', ' Chilean Soapbark', 
+                    " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', ' Trident Maple', ' Chinese Elm', ' Cork Oak', 
+                    ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+                    )
 ```
 
 <!-- to check the naming -->
 ```{r}
-length(df_trees[grep(df_trees$species_nor, pattern = "Little Gem Magnolia", ignore.case = TRUE), 'species'])
+unique(df_trees[grep(df_trees$species_nor, pattern = "Ginkgo", ignore.case = TRUE), 'species'])
 
 ```
 
@@ -463,12 +467,12 @@ smap <- get_map(san_francisco, maptype = 'hybrid') %>% #get_stamenmap(san_franci
 ```
 
 ```{r}
-smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor)) + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'))
+smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor)) #+ scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'))
 
 ```
 
-Create a map with leaflet package
 ```{r}
+## for all species
 #map center
 mlong = -122.4446
 mlat  = 37.75695
@@ -477,7 +481,30 @@ leaflet(data = df_trees_filtered,
                 width = '100%', 
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        setView(lng = mlong, lat = mlat, zoom = 10) %>%
+        addCircleMarkers(lng = df_trees_filtered$longitude, 
+                         lat = df_trees_filtered$latitude,
+                         popup = df_trees_filtered$species_nor,
+                         label = df_trees_filtered$species_nor, 
+                         radius = 4)
+```
+
+
+
+
+Create a map with leaflet package
+```{r}
+###just for one species
+
+#map center
+mlong = -122.4446
+mlat  = 37.75695
+
+leaflet(data = df_trees_filtered, 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 10) %>%
         addCircleMarkers(lng = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$longitude, 
                          lat = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$latitude,
                          popup = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor,
@@ -563,8 +590,85 @@ shinyApp(
 
 ```
 
+```{r}
+str(df_trees_filtered) 
+```
 
 
+```{r}
+##Version 2
+
+#map center
+mlong = -122.4446
+mlat  = 37.75695
+
+shinyApp(
+  
+  # Define the UI
+  ui = fluidPage(
+      
+    # App title
+    titlePanel("Trees of San Francisco"),
+      
+    # Sidebar layout with input and output definitions
+    sidebarLayout(
+        
+      # Sidebar panel for inputs 
+      sidebarPanel(
+          
+        # First input: Type of data
+        selectInput(inputId = "species", #name of the input, widget
+                      label = "Choose a species:",
+                      choices = c('All Species', ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
+                                  ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
+                      selected = ' Japanese Blueberry Tree'
+        )),
+        
+      # Main panel for displaying outputs
+      mainPanel(
+          
+        # Hide errors
+        tags$style(type = "text/css",
+                     ".shiny-output-error { visibility: hidden; }",
+                     ".shiny-output-error:before { visibility: hidden; }"),
+          
+        # Output: interactive world map
+        plotOutput("map")
+          
+        )
+      )
+    ),
+    
+  # Define the server
+  server = function(input, output) {
+    
+    filteredData <- reactive({
+      if (input$species == "All Species") {
+        df_trees_filtered
+      } else {
+        filter(df_trees_filtered, species_nor == input$species)
+      }
+    })
+      
+    output$map <- renderLeaflet({
+          
+        leaflet(filteredData(), 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        addCircleMarkers(lng = filteredData()$longitude, 
+                           lat = filteredData()$latitude,
+                           popup = filteredData()$species_nor,
+                           #label = ~species_nor, 
+                           radius = 4)
+    })
+  }
+)
+  
+
+
+```
 
 ```{r}
 runExample("03_reactivity")
