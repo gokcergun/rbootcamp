@@ -100,7 +100,7 @@ df_trees <- df_trees %>%
 ```
 
 <!--check the name split worked-->
-```{r, include=FALSE}
+```{r, echo=FALSE, results='hide'}
 head(df_trees[,c('species','species_lat','species_nor')])
 ```
 
@@ -125,10 +125,8 @@ df_trees %>% filter(is.na(date))%>%
 further analysis of missing date values: percentage of observations with missing date values, per species.
 ```{r}
 df_trees_datena <- df_trees %>% filter(is.na(date)) %>% 
-  select(c(species, date)) %>%
-  count(species)
-  
-
+ count(species)
+ 
 df_trees_species_count <- df_trees %>% count(species)
 
 df_trees_merge <- dplyr::left_join(df_trees_species_count, df_trees_datena, by="species", suffix = c("total", "date.na"))
@@ -232,7 +230,7 @@ str(df_trees_hasdate)
 
 
 
-To be able to decrease the number of species, we check the different species with a common general name (i.e Acacia, Magnolia)
+To make the number of species more manageable, we group them by family names (i.e Acacia, Magnolia)
 
 ```{r}
 unique(df_trees_hasdate[grep(df_trees_hasdate$species_lat, pattern = "^Acacia", ignore.case = TRUE), 'species_lat'])
@@ -259,7 +257,7 @@ length(unique(df_trees_hasdate$species_first))
 ```
 
 
-Create a count column to save number of planted species per year. 
+Create a count column to save number of planted trees by species, per year. 
 ```{r}
 df_trees_hasdate_tidy <- df_trees_hasdate %>%
   group_by(year) %>%
@@ -268,7 +266,7 @@ df_trees_hasdate_tidy <- df_trees_hasdate %>%
 ```
 
 
-Calculate the total number of planted trees per year and show it in a graph
+As a bit of side note we look at the total number of planted trees per year regardless of species to get a sense of overall tree planting
 ```{r}
 df_trees_hasdate_tidy %>%
   select(c('year', 'n')) %>%
@@ -283,10 +281,11 @@ df_trees_hasdate_tidy %>%
 
 ### Animated Graph
 
-In this step, We’re going to filter our dataset to retain only the top 10 planted species for every given year. 
+In this step, We’re going to filter our data set to retain only the top 10 planted species for every given year to keep the visuals
+understandable. Also we drop the species labelled Tree(s) as this obviously tells us nothing about the species.
 
 ```{r}
-df_trees_hasdate_formated <- df_trees_hasdate_tidy %>%
+df_trees_hasdate_formated <- df_trees_hasdate_tidy %>% subset(species_first != 'Tree(s)') %>% 
   group_by(year) %>%
   mutate(rank = rank(-n)) %>%
   filter(rank <=10) 
@@ -337,7 +336,7 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
   
 For gif
 ```{r}
-animate(anim, 200, fps = 3,  width = 1200, height = 1000, 
+animate(anim, 200, fps = 2,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim.gif"))
 
 ```
@@ -369,7 +368,7 @@ df_top5 <- df_trees_hasdate_tidy %>%
 ```
 
 
-Calculate the cumulative summattion for each species. 
+Calculate the cumulative summation for each species. 
 ```{r}
 df_top5_cumsum <- df_top5 %>% 
   group_by(species_first) %>% 
@@ -412,7 +411,7 @@ animate(anim2, 200, fps = 3,  width = 1200, height = 1000,
 
 #Analysis 2: 
 
-Recommended Species (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
+map of Species per  (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
 
 
 ```{r}
@@ -680,10 +679,30 @@ runExample("03_reactivity")
 
 
 #Analysis 3:
-- another map with rare (n=1/below 5) species 
+- another map with rare (n=1/below 5) species
+
+create list of rare species with name matching original df_trees 
+```{r}
+species_rare <-  df_trees_species_count%>%
+  filter(n == 1) %>%
+  separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
+
+```
+
+use list of rare species to subset original df_trees and also group them by common first name (i.e family name) to reduce species number
+```{r}
+df_trees_rare <- df_trees %>%
+  filter(species_nor %in% species_rare$species_nor) %>%
+  separate(species_lat, sep = " ", remove = FALSE, into = c('species_first', 'species_second', 'species_third'))
+
+  
+```
 
 
-
+plot map
+```{r}
+smap + geom_point(data = df_trees_rare, aes(x=longitude, y = latitude, col = species_first))
+```
 
 
 
