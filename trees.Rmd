@@ -699,12 +699,28 @@ df_trees_rare <- df_trees %>%
 ```
 
 
-plot map
+plot map with ggmap
 ```{r}
 smap + geom_point(data = df_trees_rare, aes(x=longitude, y = latitude, col = species_first))
 ```
 
+plot map using leaflet, to create a hover over dot pop up with species name, give not enough colors to differentiate so many speices
+```{r}
+#map center
+mlong = -122.4446
+mlat  = 37.75695
 
+leaflet(data = df_trees_rare, 
+                width = '100%', 
+                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+        addTiles() %>%
+        setView(lng = mlong, lat = mlat, zoom = 10) %>%
+        addCircleMarkers(lng = df_trees_rare$longitude, 
+                         lat = df_trees_rare$latitude,
+                         popup = df_trees_filtered$species_lat,
+                         label = df_trees_filtered$species_lat, 
+                         radius = 4)
+```
 
 
 
