@@ -355,14 +355,6 @@ animate(anim, 200, fps = 2,  width = 1200, height = 1000,
 
 ```
 
-For Video
-```{r}
-# For MP4
-for_mp4 <- animate(anim, 200, fps = 5,  width = 1200, height = 1000, renderer = av_renderer()) 
-anim_save("animation.mp4", animation = for_mp4 )
-
-```
-  
 ## Alternative: cumulative total of top 5 species over time
 
 find out which are the top 5 most planted species over entire time period. 'Trees' category will be omitted as it tells us nothing
