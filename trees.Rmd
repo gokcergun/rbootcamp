@@ -630,7 +630,8 @@ leaflet(data = df_trees_rare,
                          popup = df_trees_rare$species_lat,
                          label = df_trees_rare$species_lat, 
                          radius = 4,
-                         color = ~pal(df_trees_rare$species_lat))
+                         fillOpacity = .5
+                         )
 ````
 
 
