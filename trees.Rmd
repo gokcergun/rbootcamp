@@ -473,14 +473,14 @@ smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col =
 Create a map with leaflet() package
 
 
-```{r}
+```{r fig.height=12, fig.width=8}
 ## for all species
 
 ## will be added a color for each species. 
 
 #map center
 mlong = -122.4446
-mlat  = 37.75695
+mlat  = 37.72
 
 pal <- colorFactor('Paired', domain = recommended_sp)
 
@@ -489,7 +489,7 @@ leaflet(data = df_trees_filtered,
                 height = 800,
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 10) %>%
+        setView(lng = mlong, lat = mlat, zoom = 12) %>%
         addCircleMarkers(lng = df_trees_filtered$longitude, 
                          lat = df_trees_filtered$latitude,
                          color = ~pal(df_trees_filtered$species_nor),
@@ -506,7 +506,7 @@ Create a shiny app
 
 #map center
 mlong = -122.4446
-mlat  = 37.75695
+mlat  = 37.72
 
 pal <- colorFactor('Paired', domain = recommended_sp)
 
@@ -569,13 +569,14 @@ shinyApp(
                 width = '100%', 
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 11) %>%
+        setView(lng = mlong, lat = mlat, zoom = 12) %>%
         addCircleMarkers(lng = filteredData()$longitude, 
                            lat = filteredData()$latitude,
                            popup = filteredData()$species_nor,
                            color = ~pal(filteredData()$species_nor),
                            label = ~species_nor, 
-                           radius = 4)
+                           radius = 4, 
+                           fillOpacity = 0.99)
     })
   }
 )
@@ -620,7 +621,7 @@ mlat  = 37.75695
 
 
 rare_species_vec <- unique(df_trees_rare$species_lat)
-pal <- colorFactor('paired', domain = rare_species_vec)
+pal <- colorFactor('Paired', domain = rare_species_vec)
 
 leaflet(data = df_trees_rare, 
                 width = '100%', 
@@ -633,3 +634,5 @@ leaflet(data = df_trees_rare,
                          label = df_trees_rare$species_lat, 
                          radius = 4,
                          color = ~pal(df_trees_rare$species_lat))
+
+```
