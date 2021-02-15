@@ -30,6 +30,8 @@ library(ggmap)
 library(shiny)
 #install.packages('leaflet')
 library(leaflet)
+#install.packages('viridis')
+library(viridis)
 ```
 
 
@@ -482,7 +484,7 @@ Create a map with leaflet() package
 mlong = -122.4446
 mlat  = 37.72
 
-pal <- colorFactor('Paired', domain = recommended_sp)
+pal <- colorFactor('viridis', domain = recommended_sp)
 
 leaflet(data = df_trees_filtered, 
                 width = '100%', 
@@ -508,7 +510,7 @@ Create a shiny app
 mlong = -122.4446
 mlat  = 37.72
 
-pal <- colorFactor('Paired', domain = recommended_sp)
+pal <- colorFactor('viridis', domain = recommended_sp)
 
 shinyApp(
   
