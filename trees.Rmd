@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
 ```
 
-**The client**: the city of San Francisco 
+**The client**: The city of San Francisco 
 
 **The scenario**: The city of SF is looking to make use of a data set dating back some 50 years that has never been put to any use
 and where they have lost the overview. We are a data consultants who were given the data set to create a preliminary exploratory analyis type report as a trail with view to being hired on a longer term project with the data set.
@@ -84,7 +84,7 @@ for (i in 1:12){
 str(df_trees)
 ``` 
 
-**date** column has character data type. We change it to date. 
+**Date** column has character data type. We change it to date. 
 ```{r}
 # df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base r
 
@@ -579,10 +579,10 @@ shinyApp(
 ```
 
 
-#Analysis 3:
+# Analysis 3:
 - another map with rare (n=1) species
 
-create list of rare species with name matching original df_trees 
+create list of rare species (n = 1) with name matching original df_trees 
 ```{r}
 species_rare <-  df_trees_species_count%>%
   filter(n == 1) %>%
