@@ -13,7 +13,6 @@ library(data.table)
 sf_trees <- fread("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv", 
                   select = c("species", 'latitude', "longitude"))
   
-##read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
 
 ##Separate the species column into latin and common name columns.
 
