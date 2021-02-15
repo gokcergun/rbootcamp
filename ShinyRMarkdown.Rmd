@@ -1,19 +1,18 @@
 ---
-title: "Trees"
+title: "Untitled"
 author: "Gökce Ergün, Nicolas Garzon"
-date: "2/3/2021"
+date: "2/15/2021"
 output: html_document
-
+runtime: shiny
 ---
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE,  warning = FALSE, error = FALSE, message = FALSE)
 ```
 
 
-Hello world
-
 Libraries that are used
-```{r}
+```{r, warning=FALSE}
 #install.packages('dplyr')
 library(dplyr)
 #install.packages('lubridate')
@@ -388,7 +387,7 @@ df_top5_cumsum <- df_top5 %>%
 
 ```{r}
 #install.packages('transformr')
-#library('transformr')
+library('transformr')
 ```
 
 
@@ -435,7 +434,7 @@ recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flo
 ```
 
 <!-- to check the naming -->
-```{r echo=FALSE,results='hide'}
+```{r}
 unique(df_trees[grep(df_trees$species_nor, pattern = "Ginkgo", ignore.case = TRUE), 'species'])
 
 ```
@@ -447,21 +446,21 @@ df_trees$species_nor <- as.factor(df_trees$species_nor)
 
 
 ```{r}
-df_trees_recommended <- df_trees %>% 
+df_trees_filtered <- df_trees %>% 
   filter(species_nor %in% recommended_sp)
 ```
 
 
 <!-- to check whether all recommended species are selected -->
 ```{r}
-unique(df_trees_recommended$species_nor)
+unique(df_trees_filtered$species_nor)
 ```
 
 
 Get the coordinates of the whole dataset
 
 ```{r}
-df_trees_recommended %>% 
+df_trees_filtered %>% 
   summarise(max_lon = max(longitude,  na.rm=TRUE), min_lon = min(longitude,  na.rm=TRUE),
             max_lat = max(latitude,  na.rm=TRUE), min_lat = min(latitude,  na.rm=TRUE))
 ```
@@ -477,7 +476,7 @@ smap <- get_map(san_francisco, maptype = 'hybrid') %>% #get_stamenmap(san_franci
 ```
 
 ```{r  fig.height=10, fig.width=12}
-smap + geom_point(data = df_trees_recommended, aes(x=longitude, y = latitude, col = species_nor)) #+ scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'))
+smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor)) #+ scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'))
 
 ```
 
@@ -495,19 +494,19 @@ mlat  = 37.72
 
 pal <- colorFactor('Paired', domain = recommended_sp)
 
-leaflet(data = df_trees_recommended, 
+leaflet(data = df_trees_filtered, 
                 width = '100%', 
                 height = 800,
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
         setView(lng = mlong, lat = mlat, zoom = 12) %>%
-        addCircleMarkers(lng = df_trees_recommended$longitude, 
-                         lat = df_trees_recommended$latitude,
-                         color = ~pal(df_trees_recommended$species_nor),
-                         popup = df_trees_recommended$species_nor,
-                         label = df_trees_recommended$species_nor, 
+        addCircleMarkers(lng = df_trees_filtered$longitude, 
+                         lat = df_trees_filtered$latitude,
+                         color = ~pal(df_trees_filtered$species_nor),
+                         popup = df_trees_filtered$species_nor,
+                         label = df_trees_filtered$species_nor, 
                          radius = 4) %>%
-      addLayersControl(overlayGroups = df_trees_recommended$species_nor) ## add layers control
+      addLayersControl(overlayGroups = df_trees_filtered$species_nor) ## add layers control
 ```
 but map is too chaotic give large number of species...sooo Shiny to the rescue:
 
@@ -571,9 +570,9 @@ shinyApp(
     
     filteredData <- reactive({
       if (input$species == "All Species") {
-        df_trees_recommended
+        df_trees_filtered
       } else {
-        filter(df_trees_recommended, species_nor == input$species)
+        filter(df_trees_filtered, species_nor == input$species)
       }
     })
       

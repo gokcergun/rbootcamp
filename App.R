@@ -1,3 +1,22 @@
+
+# Libraries that are used
+
+library(lubridate)
+library(tidyverse)
+library(shiny)
+library(leaflet)
+library(data.table)
+
+
+#read data 
+
+sf_trees <- fread("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv", 
+                  select = c("species", 'latitude', "longitude"))
+  
+#read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+
+
+
 #map center
 mlong = -122.4446
 mlat  = 37.72
