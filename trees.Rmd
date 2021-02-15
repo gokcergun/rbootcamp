@@ -9,8 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
 ```
 
+**The client**: the city of San Francisco
 
-Hello world
+**The scenario**: The city of SF is looking to make use of a data set dating back some 50 years that has never been put to any use
+and where they have lost the overview. We are a data consultants who were given the data set to create a preliminary exploratory analyis type report as a trail with view to being hired on a longer term project with the data set.
+
 
 Libraries that are used
 ```{r, warning=FALSE}
