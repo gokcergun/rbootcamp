@@ -8,39 +8,46 @@ library(leaflet)
 library(data.table)
 
 
-#read data 
+##read data 
 
 sf_trees <- fread("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv", 
                   select = c("species", 'latitude', "longitude"))
   
-#read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+##read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv')
+
+##Separate the species column into latin and common name columns.
+
+sf_trees <- sf_trees %>% 
+  separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
+
+sf_trees$species_nor <- as.factor(df_trees$species_nor)
+
+##map of recommended species per  (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
+recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', ' Flowering Cherry', 
+                    ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', ' Hybrid Strawberry Tree', 
+                    ' Primrose Tree', ' Brisbane Box', ' Mediterranean Fan Palm', ' Fruitless Olive', ' Chilean Soapbark', 
+                    " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', ' Trident Maple', ' Chinese Elm', ' Cork Oak', 
+                    ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+)
 
 
+df_trees_recommended <- sf_trees %>% 
+  filter(species_nor %in% recommended_sp)
 
-#map center
+
+##map center
 mlong = -122.4446
 mlat  = 37.72
 
-pal <- colorFactor('Paired', domain = recommended_sp, reverse = TRUE)
+pal <- colorFactor('Paired', domain = recommended_sp)
 
-shinyApp(
-  
-  # Define the UI
-  ui = fluidPage(
-    
-    # App title
-    titlePanel("Recommended Tree Species of San Francisco"),
-    
-    #tabPanel(a(href='https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf', 'Source')),
-    
-    # Sidebar layout with input and output definitions
-    sidebarLayout(
-      
-      # Sidebar panel for inputs 
-      sidebarPanel(
-        
-        # First input: Type of data
-        
+
+##Define the UI
+ui = fluidPage(
+  titlePanel("Recommended Tree Species of San Francisco"),  ##App title
+  #tabPanel(a(href='https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf', 'Source')),
+  sidebarLayout(          ##Sidebar layout with input and output definitions
+    sidebarPanel(         ##Sidebar panel for input
         checkboxGroupInput(inputId = "species", #name of the input, widget
                            label = "Choose a species:",
                            choices = c('All Species',  ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', 
@@ -52,25 +59,20 @@ shinyApp(
                            ), 
                            selected = ' Japanese Blueberry Tree'
         )),
-      
-      # Main panel for displaying outputs
-      mainPanel(
-        
-        # Hide errors
-        tags$style(type = "text/css",
+    
+    mainPanel(             ##Main panel for displaying outputs
+      tags$style(type = "text/css",                   ##Hide errors
                    ".shiny-output-error { visibility: hidden; }",
                    ".shiny-output-error:before { visibility: hidden; }"),
         
-        # Output: interactive world map
-        leafletOutput("map", height = 800)
+   
+    leafletOutput("map", height = 800)    ##Output: interactive leaflet map
         
-      )
     )
-  ),
+   )
+)
   
-  # Define the server
-  server = function(input, output) {
-    
+server = function(input, output) {        ##Define the server
     filteredData <- reactive({
       if (input$species == "All Species") {
         df_trees_filtered
@@ -79,22 +81,22 @@ shinyApp(
       }
     })
     
-    output$map <- renderLeaflet({
+  output$map <- renderLeaflet({
       
-      leaflet(filteredData(), 
-              width = '100%', 
-              options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
-        addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 12) %>%
-        addCircleMarkers(lng = filteredData()$longitude, 
-                         lat = filteredData()$latitude,
-                         popup = filteredData()$species_nor,
-                         color = ~pal(filteredData()$species_nor),
-                         label = ~species_nor, 
-                         radius = 4, 
-                         fillOpacity = 0.99)
-    })
-  }
-)
+    leaflet(filteredData(), 
+            width = '100%', 
+            options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
+      addTiles() %>%
+      setView(lng = mlong, lat = mlat, zoom = 12) %>%
+      addCircleMarkers(lng = filteredData()$longitude, 
+                       lat = filteredData()$latitude,
+                       popup = filteredData()$species_nor,
+                       color = ~pal(filteredData()$species_nor),
+                       label = ~species_nor, 
+                       radius = 4, 
+                       fillOpacity = 0.99)
+  })
+}
 
 
+shinyApp(ui, server)

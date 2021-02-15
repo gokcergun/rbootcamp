@@ -522,7 +522,7 @@ Create a shiny app version of the map above, with a drop down menu to look at ea
 mlong = -122.4446
 mlat  = 37.72
 
-pal <- colorFactor('Paired', domain = recommended_sp, reverse = TRUE)
+pal <- colorFactor('Paired', domain = recommended_sp)
 
 shinyApp(
   
