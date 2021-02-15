@@ -355,14 +355,6 @@ animate(anim, 200, fps = 2,  width = 1200, height = 1000,
 
 ```
 
-For Video
-```{r}
-# For MP4
-for_mp4 <- animate(anim, 200, fps = 5,  width = 1200, height = 1000, renderer = av_renderer()) 
-anim_save("animation.mp4", animation = for_mp4 )
-
-```
-  
 ## Alternative: cumulative total of top 5 species over time
 
 find out which are the top 5 most planted species over entire time period. 'Trees' category will be omitted as it tells us nothing
@@ -485,8 +477,6 @@ smap + geom_point(data = df_trees_recommended, aes(x=longitude, y = latitude, co
 ```
 
 Create map with leaflet() package
-
-
 ```{r fig.height=12, fig.width=8}
 ## for all species
 
@@ -512,9 +502,9 @@ leaflet(data = df_trees_recommended,
                          radius = 4) %>%
       addLayersControl(overlayGroups = df_trees_recommended$species_nor) ## add layers control
 ```
-but map is too chaotic give large number of species...sooo Shiny to the rescue:
+but map is too chaotic given large number of species...sooo Shiny to the rescue:
 
-Create a shiny app version of the map above, with a drop down menu to look at each species at a time.
+Create a shiny app version of the map above, with a check-box to look at each species at a time.
 
 
 ```{r}
