@@ -618,6 +618,10 @@ plot map using leaflet, to create a hover over dot pop up with species name, giv
 mlong = -122.4446
 mlat  = 37.75695
 
+
+rare_species_vec <- unique(df_trees_rare$species_lat)
+pal <- colorFactor('paired', domain = rare_species_vec)
+
 leaflet(data = df_trees_rare, 
                 width = '100%', 
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
@@ -628,11 +632,4 @@ leaflet(data = df_trees_rare,
                          popup = df_trees_rare$species_lat,
                          label = df_trees_rare$species_lat, 
                          radius = 4,
-                         color = factor(df_trees_rare$species_lat))
-```
-
-
-
-
-
-
+                         color = ~pal(df_trees_rare$species_lat))
