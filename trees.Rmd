@@ -482,18 +482,17 @@ Create a map with leaflet() package
 mlong = -122.4446
 mlat  = 37.75695
 
-species <- df_trees_filtered$species_nor %>% unique()
-#pal <- leaflet::colorFactor(viridis_pal(option = "C")(2), domain = species)
+pal <- colorFactor('Paired', domain = recommended_sp)
 
 leaflet(data = df_trees_filtered, 
                 width = '100%', 
+                height = 800,
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
         setView(lng = mlong, lat = mlat, zoom = 10) %>%
         addCircleMarkers(lng = df_trees_filtered$longitude, 
                          lat = df_trees_filtered$latitude,
-                         color = df_trees_filtered$species_nor,
-                         group = df_trees_filtered$species_nor,
+                         color = ~pal(df_trees_filtered$species_nor),
                          popup = df_trees_filtered$species_nor,
                          label = df_trees_filtered$species_nor, 
                          radius = 4) %>%
@@ -508,6 +507,8 @@ Create a shiny app
 #map center
 mlong = -122.4446
 mlat  = 37.75695
+
+pal <- colorFactor('Paired', domain = recommended_sp)
 
 shinyApp(
   
@@ -572,7 +573,8 @@ shinyApp(
         addCircleMarkers(lng = filteredData()$longitude, 
                            lat = filteredData()$latitude,
                            popup = filteredData()$species_nor,
-                           #label = ~species_nor, 
+                           color = ~pal(filteredData()$species_nor),
+                           label = ~species_nor, 
                            radius = 4)
     })
   }
