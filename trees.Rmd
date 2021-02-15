@@ -476,6 +476,9 @@ smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col =
 mlong = -122.4446
 mlat  = 37.75695
 
+species <- df_trees_filtered$species_nor %>% unique()
+#pal <- leaflet::colorFactor(viridis_pal(option = "C")(2), domain = species)
+
 leaflet(data = df_trees_filtered, 
                 width = '100%', 
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
@@ -483,9 +486,12 @@ leaflet(data = df_trees_filtered,
         setView(lng = mlong, lat = mlat, zoom = 10) %>%
         addCircleMarkers(lng = df_trees_filtered$longitude, 
                          lat = df_trees_filtered$latitude,
+                         color = df_trees_filtered$species_nor,
+                         group = df_trees_filtered$species_nor,
                          popup = df_trees_filtered$species_nor,
                          label = df_trees_filtered$species_nor, 
-                         radius = 4)
+                         radius = 4) %>%
+      addLayersControl(overlayGroups = df_trees_filtered$species_nor) ## add layers control
 ```
 
 
@@ -515,7 +521,6 @@ leaflet(data = df_trees_filtered,
 Create a shiny app
 
 ```{r}
-##doesnt work
 
 #map center
 mlong = -122.4446
@@ -538,8 +543,13 @@ shinyApp(
         # First input: Type of data
         selectInput(inputId = "species", #name of the input, widget
                       label = "Choose a species:",
-                      choices = c('All Species', ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
-                                  ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
+                      choices = c('All Species',  ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', 
+                                  ' Flowering Cherry', ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', 
+                                  ' Hybrid Strawberry Tree', ' Primrose Tree', ' Brisbane Box', ' Mediterranean Fan Palm', 
+                                  ' Fruitless Olive', ' Chilean Soapbark', " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', 
+                                  ' Trident Maple', ' Chinese Elm', ' Cork Oak', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', 
+                                  ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+                    ), 
                       selected = ' Japanese Blueberry Tree'
         )),
         
@@ -552,7 +562,7 @@ shinyApp(
                      ".shiny-output-error:before { visibility: hidden; }"),
           
         # Output: interactive world map
-        plotOutput("map")
+        leafletOutput("map", height = 800)
           
         )
       )
@@ -588,91 +598,6 @@ shinyApp(
 
 
 ```
-
-```{r}
-str(df_trees_filtered) 
-```
-
-
-```{r}
-##Version 2
-
-#map center
-mlong = -122.4446
-mlat  = 37.75695
-
-shinyApp(
-  
-  # Define the UI
-  ui = fluidPage(
-      
-    # App title
-    titlePanel("Trees of San Francisco"),
-      
-    # Sidebar layout with input and output definitions
-    sidebarLayout(
-        
-      # Sidebar panel for inputs 
-      sidebarPanel(
-          
-        # First input: Type of data
-        selectInput(inputId = "species", #name of the input, widget
-                      label = "Choose a species:",
-                      choices = c('All Species', ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', 
-                                  ' Red Flowering Gum', ' Flowering Cherry', ' Little Gem Magnolia'), 
-                      selected = ' Japanese Blueberry Tree'
-        )),
-        
-      # Main panel for displaying outputs
-      mainPanel(
-          
-        # Hide errors
-        tags$style(type = "text/css",
-                     ".shiny-output-error { visibility: hidden; }",
-                     ".shiny-output-error:before { visibility: hidden; }"),
-          
-        # Output: interactive world map
-        plotOutput("map")
-          
-        )
-      )
-    ),
-    
-  # Define the server
-  server = function(input, output) {
-    
-    filteredData <- reactive({
-      if (input$species == "All Species") {
-        df_trees_filtered
-      } else {
-        filter(df_trees_filtered, species_nor == input$species)
-      }
-    })
-      
-    output$map <- renderLeaflet({
-          
-        leaflet(filteredData(), 
-                width = '100%', 
-                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
-        addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 11) %>%
-        addCircleMarkers(lng = filteredData()$longitude, 
-                           lat = filteredData()$latitude,
-                           popup = filteredData()$species_nor,
-                           #label = ~species_nor, 
-                           radius = 4)
-    })
-  }
-)
-  
-
-
-```
-
-```{r}
-runExample("03_reactivity")
-```
-
 
 
 - map shows the top 5(/10) most planted species on a map
