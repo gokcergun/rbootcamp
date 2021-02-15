@@ -5,6 +5,11 @@ date: "2/3/2021"
 output: html_document
 
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
+```
+
+
 Hello world
 
 Libraries that are used
@@ -132,7 +137,8 @@ df_trees_species_count <- df_trees %>% count(species)
 df_trees_merge <- dplyr::left_join(df_trees_species_count, df_trees_datena, by="species", suffix = c("total", "date.na"))
 df_trees_merge$percent.missing <- df_trees_merge$ndate.na / df_trees_merge$ntotal
 df_trees_merge %>%
-  arrange(desc(ntotal), desc(percent.missing))
+  arrange(desc(ntotal), desc(percent.missing)) %>%
+  head()
 
 ```
 
@@ -143,14 +149,16 @@ We look at the total number of observations we would lose if we drop species whe
 ```{r}
 df_trees_merge %>% filter(percent.missing==1) %>% select(ntotal) %>%
   sum()
-  #arrange(desc(percent.missing), desc(ntotal))
 ```
 
 How the percentage of missing date values per species is distributed. All species that have 100% of date data missing have a very low number of observations (n <=100).    
 
 ```{r}
 df_trees_merge %>% 
-  ggplot(aes(percent.missing))+geom_histogram() +scale_x_continuous(breaks=seq(0,1, .10))
+  ggplot(aes(percent.missing)) + geom_histogram(fill='skyblue4') + 
+  labs(title='Percentage of Missing Date Values per Species') +
+  xlab('Percentage of missing date') + ylab('Count') + 
+  scale_x_continuous(breaks=seq(0,1, .10)) +theme_minimal()
 
 ```
 
@@ -159,7 +167,10 @@ Therefore, we now filter the cases based on this 100 ntotal threshold to get a c
 
 ```{r}
 df_trees_merge %>% filter(ntotal>100) %>%
-  ggplot(aes(percent.missing))+geom_histogram() +scale_x_continuous(breaks=seq(0,1, .10))
+  ggplot(aes(percent.missing))+geom_histogram(fill='skyblue4') + 
+  labs(title='Percentage of Missing Date Values per Species') +
+  xlab('Percentage of missing date') + ylab('Count') + 
+  scale_x_continuous(breaks=seq(0,1, .10)) + theme_minimal()
 
 ```
 
@@ -177,6 +188,7 @@ df_trees %>%
 
 Create a new column that shows age using the year column to calculate it. Use the more modern approach mutate(). Then use age column 
 to get an overview of the distribution of tree ages via a histogram.
+
 ```{r}
 
 df_trees <- df_trees %>% 
@@ -186,8 +198,6 @@ df_trees <- df_trees %>%
 hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'royalblue2') # using base r
 
 ```
-
-
 
 
 Count the species
@@ -204,12 +214,13 @@ Show number of distinct species in a street
 df_trees %>%
   group_by(address) %>%
   summarize(n = n_distinct(species_lat)) %>%
-  arrange(desc(n))
+  arrange(desc(n)) %>%
+  head()
 ```
 
 
 
-# Analysis 1: evolution of planted species over time
+# Analysis 1: Evolution of planted species over time
 
 To do this specific analysis we drop the trees, which have missing date data for obvious reasons. Based on our missing date data analysis in the data cleaning section, we are confident the data does not display any obvious signs of MNAR. 
 
@@ -222,10 +233,10 @@ df_trees_hasdate <- df_trees %>%
 
 str(df_trees_hasdate)
 ```
-  
+ 
+**Species_lat** is saved as a factor.   
 ```{r}
 df_trees_hasdate$species_lat <- as.factor(df_trees_hasdate$species_lat)
-str(df_trees_hasdate)
 ```
 
 
@@ -244,7 +255,7 @@ unique(df_trees_hasdate[grep(df_trees_hasdate$species_lat, pattern = "^Magnolia"
 It seems that specific species can be grouped together with a general name. Since the general name is the first word of the species name, we will separate the species name into its words and then use the first word as the species general name. 
 
 
-Separate the species_lat column into first and second part
+Separate the species_lat column into its parts
 
 ```{r}
 df_trees_hasdate <- df_trees_hasdate %>% 
@@ -465,7 +476,7 @@ smap <- get_map(san_francisco, maptype = 'hybrid') %>% #get_stamenmap(san_franci
   ggmap()
 ```
 
-```{r}
+```{r  fig.height=8, fig.width=12}
 smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col = species_nor)) #+ scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00'))
 
 ```
@@ -503,7 +514,7 @@ but map is too chaotic give large number of species...sooo Shiny to the rescue:
 Create a shiny app version of the map above, with a drop down menu to look at each species at a time.
 
 
-```{r}
+```{r fig.height=12, fig.width=8}
 #map center
 mlong = -122.4446
 mlat  = 37.72
