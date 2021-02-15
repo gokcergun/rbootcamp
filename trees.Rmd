@@ -30,8 +30,6 @@ library(ggmap)
 library(shiny)
 #install.packages('leaflet')
 library(leaflet)
-#install.packages('viridis')
-library(viridis)
 ```
 
 
@@ -504,13 +502,13 @@ but map is too chaotic give large number of species...sooo Shiny to the rescue:
 
 Create a shiny app version of the map above, with a drop down menu to look at each species at a time.
 
-```{r}
 
+```{r}
 #map center
 mlong = -122.4446
 mlat  = 37.72
 
-pal <- colorFactor('viridis', domain = recommended_sp)
+pal <- colorFactor('Paired', domain = recommended_sp, reverse = TRUE)
 
 shinyApp(
   
@@ -518,7 +516,9 @@ shinyApp(
   ui = fluidPage(
       
     # App title
-    titlePanel("Trees of San Francisco"),
+    titlePanel("Recommended Tree Species of San Francisco"),
+               
+    #tabPanel(a(href='https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf', 'Source')),
       
     # Sidebar layout with input and output definitions
     sidebarLayout(
@@ -527,7 +527,8 @@ shinyApp(
       sidebarPanel(
           
         # First input: Type of data
-        selectInput(inputId = "species", #name of the input, widget
+        
+        checkboxGroupInput(inputId = "species", #name of the input, widget
                       label = "Choose a species:",
                       choices = c('All Species',  ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', 
                                   ' Flowering Cherry', ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', 
@@ -586,7 +587,6 @@ shinyApp(
 
 
 ```
-
 
 
 #Analysis 3:
