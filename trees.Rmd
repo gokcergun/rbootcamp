@@ -619,10 +619,7 @@ df_trees_rare <- df_trees %>%
 
   
 ```
-plot map with ggmap
-```{r}
-smap + geom_point(data = df_trees_rare, aes(x=longitude, y = latitude, col = species_first))
-```
+
 
 plot map using leaflet, to create a hover-over dot pop up with species name, given not enough colors to differentiate so many species
 ```{r}
