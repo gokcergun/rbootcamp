@@ -102,5 +102,5 @@ app <- shinyApp(ui, server)
  
 runApp(app)
 
-library(rsconnect)
-rsconnect::deployApp('./')
+#library(rsconnect)
+#rsconnect::deployApp('./')
