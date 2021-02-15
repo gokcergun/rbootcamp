@@ -19,7 +19,7 @@ sf_trees <- fread("https://raw.githubusercontent.com/rfordatascience/tidytuesday
 sf_trees <- sf_trees %>% 
   separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
 
-sf_trees$species_nor <- as.factor(df_trees$species_nor)
+sf_trees$species_nor <- as.factor(sf_trees$species_nor)
 
 ##map of recommended species per  (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
 recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', ' Flowering Cherry', 
@@ -98,9 +98,7 @@ server = function(input, output) {        ##Define the server
 }
 
 
-app <- shinyApp(ui, server)
- 
-runApp(app)
+shinyApp(ui, server)
 
-#library(rsconnect)
-#rsconnect::deployApp('./')
+
+
