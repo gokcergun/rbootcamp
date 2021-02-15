@@ -44,7 +44,8 @@ pal <- colorFactor('Paired', domain = recommended_sp)
 ##Define the UI
 ui = fluidPage(
   titlePanel("Recommended Tree Species of San Francisco"),  ##App title
-  #tabPanel(a(href='https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf', 'Source')),
+  helpText( a("See the Source of Recommended Trees",  
+              href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf")),
   sidebarLayout(          ##Sidebar layout with input and output definitions
     sidebarPanel(         ##Sidebar panel for input
         checkboxGroupInput(inputId = "species", #name of the input, widget

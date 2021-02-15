@@ -531,11 +531,15 @@ leaflet(data = df_trees_rare,
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
         setView(lng = mlong, lat = mlat, zoom = 12) %>%
-        addCircleMarkers(lng = df_trees_rare$longitude, 
+        addMarkers(lng = df_trees_rare$longitude, 
                          lat = df_trees_rare$latitude,
+                         icon = list(
+                            iconUrl = 'https://icons.iconarchive.com/icons/pixelkit/flat-jewels/512/Tree-icon.png',
+                            iconSize = c(30, 30)
+                         ), 
                          popup = df_trees_rare$species_lat,
-                         label = df_trees_rare$species_lat, 
-                         radius = 4,
-                         fillOpacity = .5)
+                         label = df_trees_rare$species_lat)
+                         #radius = 4,
+                         #fillOpacity = .5)
 
 ```
