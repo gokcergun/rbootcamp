@@ -534,7 +534,8 @@ leaflet(data = df_trees_rare,
         addMarkers(lng = df_trees_rare$longitude, 
                          lat = df_trees_rare$latitude,
                          icon = list(
-                            iconUrl = 'https://icons.iconarchive.com/icons/pixelkit/flat-jewels/512/Tree-icon.png',
+                            iconUrl = 'https://icons.iconarchive.com/icons/matthew-kelleigh/mac-town-vol2/32/Tree-1-icon.png',
+                              #'https://icons.iconarchive.com/icons/pixelkit/flat-jewels/512/Tree-icon.png',
                             iconSize = c(30, 30)
                          ), 
                          popup = df_trees_rare$species_lat,
