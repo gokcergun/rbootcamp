@@ -477,8 +477,6 @@ smap + geom_point(data = df_trees_recommended, aes(x=longitude, y = latitude, co
 ```
 
 Create map with leaflet() package
-
-
 ```{r fig.height=12, fig.width=8}
 ## for all species
 
@@ -504,7 +502,7 @@ leaflet(data = df_trees_recommended,
                          radius = 4) %>%
       addLayersControl(overlayGroups = df_trees_recommended$species_nor) ## add layers control
 ```
-but map is too chaotic give large number of species...sooo Shiny to the rescue:
+but map is too chaotic given large number of species...sooo Shiny to the rescue:
 
 Create a shiny app version of the map above, with a drop down menu to look at each species at a time.
 
