@@ -470,7 +470,7 @@ smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col =
 
 ```
 
-Create a map with leaflet() package
+Create map with leaflet() package
 
 
 ```{r}
@@ -498,9 +498,9 @@ leaflet(data = df_trees_filtered,
                          radius = 4) %>%
       addLayersControl(overlayGroups = df_trees_filtered$species_nor) ## add layers control
 ```
+but map is too chaotic give large number of species...sooo Shiny to the rescue:
 
-
-Create a shiny app
+Create a shiny app version of the map above, with a drop down menu to look at each species at a time.
 
 ```{r}
 
@@ -587,7 +587,7 @@ shinyApp(
 
 
 #Analysis 3:
-- another map with rare (n=1/below 5) species
+- another map with rare (n=1) species
 
 create list of rare species with name matching original df_trees 
 ```{r}
@@ -610,21 +610,21 @@ plot map with ggmap
 smap + geom_point(data = df_trees_rare, aes(x=longitude, y = latitude, col = species_first))
 ```
 
-plot map using leaflet, to create a hover over dot pop up with species name, given not enough colors to differentiate so many speices
+plot map using leaflet, to create a hover-over dot pop up with species name, given not enough colors to differentiate so many species
 ```{r}
 #map center
 mlong = -122.4446
-mlat  = 37.75695
+mlat  = 37.72
 
 
 rare_species_vec <- unique(df_trees_rare$species_lat)
 pal <- colorFactor('Paired', domain = rare_species_vec)
 
 leaflet(data = df_trees_rare, 
-                width = '100%', 
+                width = '100%', height = 800,
                 options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
         addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 10) %>%
+        setView(lng = mlong, lat = mlat, zoom = 12) %>%
         addCircleMarkers(lng = df_trees_rare$longitude, 
                          lat = df_trees_rare$latitude,
                          popup = df_trees_rare$species_lat,
