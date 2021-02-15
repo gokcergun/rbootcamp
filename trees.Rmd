@@ -470,8 +470,14 @@ smap + geom_point(data = df_trees_filtered, aes(x=longitude, y = latitude, col =
 
 ```
 
+Create a map with leaflet() package
+
+
 ```{r}
 ## for all species
+
+## will be added a color for each species. 
+
 #map center
 mlong = -122.4446
 mlat  = 37.75695
@@ -492,29 +498,6 @@ leaflet(data = df_trees_filtered,
                          label = df_trees_filtered$species_nor, 
                          radius = 4) %>%
       addLayersControl(overlayGroups = df_trees_filtered$species_nor) ## add layers control
-```
-
-
-
-
-Create a map with leaflet package
-```{r}
-###just for one species
-
-#map center
-mlong = -122.4446
-mlat  = 37.75695
-
-leaflet(data = df_trees_filtered, 
-                width = '100%', 
-                options = leafletOptions(minZoom = 9, maxZoom = 18)) %>% 
-        addTiles() %>%
-        setView(lng = mlong, lat = mlat, zoom = 10) %>%
-        addCircleMarkers(lng = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$longitude, 
-                         lat = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$latitude,
-                         popup = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor,
-                         label = df_trees_filtered[df_trees_filtered$species_nor == ' Japanese Blueberry Tree', ]$species_nor, 
-                         radius = 4)
 ```
 
 
