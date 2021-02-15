@@ -98,7 +98,9 @@ server = function(input, output) {        ##Define the server
 }
 
 
-shinyApp(ui, server)
+app <- shinyApp(ui, server)
+ 
+runApp(app)
 
 library(rsconnect)
 rsconnect::deployApp('./')
