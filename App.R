@@ -74,9 +74,9 @@ ui = fluidPage(
 server = function(input, output) {        ##Define the server
     filteredData <- reactive({
       if (input$species == "All Species") {
-        df_trees_filtered
+        df_trees_recommended
       } else {
-        filter(df_trees_filtered, species_nor == input$species)
+        filter(df_trees_recommended, species_nor == input$species)
       }
     })
     
