@@ -65,7 +65,7 @@ ui = fluidPage(
                    ".shiny-output-error:before { visibility: hidden; }"),
         
    
-    leafletOutput("map", height = 800)    ##Output: interactive leaflet map
+      leafletOutput("map", height = 800)    ##Output: interactive leaflet map
         
     )
    )
