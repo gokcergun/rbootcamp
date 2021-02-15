@@ -504,7 +504,7 @@ leaflet(data = df_trees_recommended,
 ```
 but map is too chaotic given large number of species...sooo Shiny to the rescue:
 
-Create a shiny app version of the map above, with a drop down menu to look at each species at a time.
+Create a shiny app version of the map above, with a check-box to look at each species at a time.
 
 
 ```{r}
