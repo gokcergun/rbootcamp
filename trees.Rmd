@@ -2,11 +2,9 @@
 title: "Trees of San Francisco"
 author:
 - Gökce Ergün (19-865-526)
-- Nicolas Garzon
-date: "2/3/2021"
+- Nicolas Garzon(19-865-575)
+date: "16/02/2021"
 output:
-  word_document: default
-  pdf_document: default
   html_document: default
 ---
 ```{r setup, include=FALSE}
@@ -16,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FAL
 **The client**: The city of San Francisco 
 
 **The scenario**: The city of SF is looking to make use of a data set dating back some 50 years that has never been put to any use
-and where they have lost the overview. We are a data consultants who were given the data set to create a preliminary exploratory analyis type report as a trail with view to being hired on a longer term project with the [data set](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-01-28).
+and where they have lost the overview. We are data consultants who were given the data set to create a preliminary exploratory analyis type report as a trial with view to being hired on a longer term project with the [data set](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-01-28).
 
 
 Libraries that are used
@@ -42,6 +40,7 @@ library(ggmap)
 library(shiny)
 #install.packages('leaflet')
 library(leaflet)
+library(mgcv)
 ```
 
 
@@ -162,14 +161,14 @@ df_trees_merge %>% filter(percent.missing==1) %>% select(ntotal) %>%
   sum()
 ```
 
-How the percentage of missing date values per species is distributed. All species that have 100% of date data missing have a very low number of observations (n <=100).    
+Below we see how the percentage of missing date values per species is distributed. All species that have 100% of date data missing have a very low number of observations (n <=100).    
 
 ```{r}
 df_trees_merge %>% 
   ggplot(aes(percent.missing)) + geom_histogram(fill='skyblue4') + 
   labs(title='Percentage of Missing Date Values per Species') +
-  xlab('Percentage of missing date') + ylab('Count') + 
-  scale_x_continuous(breaks=seq(0,1, .10)) +theme_minimal()
+  xlab('Missing Date per Species (%)') + ylab('Number of Species') + 
+  scale_x_continuous(breaks=seq(0,1, .10)) +theme_minimal(base_size = 14)
 
 ```
 
@@ -180,15 +179,14 @@ Therefore, we now filter the cases based on this 100 ntotal threshold to get a c
 df_trees_merge %>% filter(ntotal>100) %>%
   ggplot(aes(percent.missing))+geom_histogram(fill='skyblue4') + 
   labs(title='Percentage of Missing Date Values per Species') +
-  xlab('Percentage of missing date') + ylab('Count') + 
-  scale_x_continuous(breaks=seq(0,1, .10)) + theme_minimal()
-
+  xlab('Missing Date per Species (%)') + ylab('Number of Species') + 
+  scale_x_continuous(breaks=seq(0,1, .10)) +theme_minimal(base_size = 14)
 ```
 
 
 # Exploratory Analysis
 
-Checking year of plantation range. most of the trees (50%) were planted between 2001 and 2020. However, it is likely that many of
+Checking year of plantation range. We see most of the trees (50%) were planted between 2001 and 2020. However, it is likely that many of
 the older trees simply were not recorded so they either dont appear in our data or have a missing date value. 
 ```{r}
 df_trees %>%
@@ -197,8 +195,8 @@ df_trees %>%
   
 ```
 
-Create a new column that shows age using the year column to calculate it. Use the more modern approach mutate(). Then use age column 
-to get an overview of the distribution of tree ages via a histogram.
+lets visualize the information above, but this time with age instead of date.  
+NOTE: We create a new column that shows age using the year column to calculate it using the more modern approach mutate().
 
 ```{r}
 
@@ -211,7 +209,7 @@ hist(df_trees$age, main = 'Tree Age Distribution', xlab = 'Age', col = 'skyblue4
 ```
 
 
-Count the species
+Lets get an overview of the number of trees per species and look a the top 20 most abundant ones.
 ```{r}
 df_trees %>%
   count(species_lat) %>%
@@ -219,7 +217,7 @@ df_trees %>%
   top_n(n = 20)
 ```
 
-Show number of distinct species in a street
+What could also be interesting would be too look at how species diversity varies by street. We thus take a look below at the top 10 streets with the highest tree diversity.
 
 ```{r}
 df_trees %>%
@@ -232,7 +230,9 @@ df_trees %>%
 
 
 
-# Analysis 1: Evolution of planted species over time
+# Analysis 1: Evolution of Planted Tree Species Over Time
+
+We think it would be interesting to take a look at how the popularity of  planted tree species has changed over time. Accordingly, below we execute all the steps necessary to created an animated visualization of this evolution. We feel adding the animation aspect to the graphic allows this data story to be more engaging. Additionally, it allows us to always dynamically highlight only the top 5 most planted in each year.  
 
 To do this specific analysis we drop the trees, which have missing date data for obvious reasons. Based on our missing date data analysis in the data cleaning section, we are confident the data does not display any obvious signs of MNAR. 
 
@@ -246,7 +246,7 @@ df_trees_hasdate <- df_trees %>%
 str(df_trees_hasdate)
 ```
  
-**Species_lat** is saved as a factor.   
+*Species_lat* is saved as a factor.   
 ```{r}
 df_trees_hasdate$species_lat <- as.factor(df_trees_hasdate$species_lat)
 ```
@@ -273,7 +273,7 @@ df_trees_hasdate <- df_trees_hasdate %>%
   separate(species_lat, sep = " ", remove = FALSE, into = c('species_first', 'species_second', 'species_third'))
 ```
 
-The code below shows that the number of unique species after recategorizing **species_lat** is 158.
+The code below shows that the number of unique species after recategorizing *species_lat* is 158.
 ```{r}
 length(unique(df_trees_hasdate$species_first))
 ```
@@ -286,20 +286,6 @@ df_trees_hasdate_tidy <- df_trees_hasdate %>%
   count(species_first) %>%
   arrange(year, desc(n)) 
 ```
-
-
-As a bit of side note we look at the total number of planted trees per year regardless of species to get a sense of overall tree planting
-```{r}
-df_trees_hasdate_tidy %>%
-  select(c('year', 'n')) %>%
-  aggregate(by = list(df_trees_hasdate_tidy$year), FUN='sum') %>%
-  ggplot(aes(x = Group.1, y = n)) + 
-  geom_line() + 
-  labs(title = 'Total Number of Planted Trees per Year', 
-       x = 'Year', y = 'Total number of planted trees') +
-  theme_minimal()
-```
-
 
 ### Animated Graph
 
@@ -363,10 +349,12 @@ animate(anim, 200, fps = 2,  width = 1200, height = 1000,
 
 ```
 
-### Alternative: Cumulative total of top 5 species over time
+In this animation we observe that the top 10 most planted species per year (non-cumulative) vary significantly over time, with only a few species like Ficus consistently figuring in the top 10. The species planting patterns thus appear to be volatile and are either follow no pattern, or are based on the previous current species base. However, we have to highlight that this data sample is very small given we only have date data for roughly 35% of our observations. Accordingly, this analysis must be taken with a pinch of salt.
 
-find out which are the top 5 most planted species over entire time period. 'Trees' category will be omitted as it tells us nothing
-about species
+### Cumulative Total of Top 5 Tree Species Over Time
+
+Another very different take would be to look at the cumulative base of each species over time. We suspect this might be more stable than looking at the top planted species per year.  
+Below we find out which are the top 5 most planted species over entire time period. The 'Trees' category will once again be omitted as it tells us nothing about species.
 
 ```{r}
 df_agg <- aggregate(df_trees_hasdate_tidy$n, by=list(df_trees_hasdate_tidy$species_first), FUN='sum')
@@ -375,7 +363,7 @@ df_agg %>%
   top_n(n=6)
 ```
 
-create df to be used for cumulative summation
+Create a data frame to be used for cumulative summation
 ```{r}
 df_top5 <- df_trees_hasdate_tidy %>%
   filter(species_first == 'Prunus' | species_first == 'Tristaniopsis' | species_first == 'Lophostemon' | species_first == 'Magnolia' | species_first =='Arbutus')
@@ -389,13 +377,13 @@ df_top5_cumsum <- df_top5 %>%
   mutate(csum = cumsum(n))
 ```
 
-Save the data type of **year** column as Date 
+Save the data type of *year* column as Date 
 ```{r}
 df_top5_cumsum$year <- lubridate::ymd(df_top5_cumsum$year, truncated = 2L)
 ```
 
 Create the static plot
-```{r cache=TRUE}
+```{r}
 species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00')) +  
   theme_minimal(base_size = 22) 
                                                                                       
@@ -403,23 +391,39 @@ species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first,
 
 
 Create the animated plot with transition 
-```{r cache=TRUE}
+```{r}
 anim2 <- species_cumsum + transition_reveal(year) + view_follow(fixed_x = TRUE)  +
   labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum', colour = 'Top 5 Species') 
 ```
  
 Animated graph (gif version): 
 
-```{r cache=TRUE}
-animate(anim2, 200, fps = 5,  width = 1200, height = 1000, 
+```{r}
+animate(anim2, 200, fps = 5,  width = 1200, height = 800, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
 
-  
+we see a pattern that when each of the top 5 species is first introduced their rate of increase is very high (steep slope), and after some time all of slopes start to flatten, with Prunus flattening at a significantly slower rate than the other 4. 
 
-### Analysis 2: 
+As a bit of side note we look at the total number of planted trees per year regardless of species to get a sense of overall tree planting
 
-map of recommended species per  [Source](https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf): 
+```{r}
+df_trees_hasdate_tidy %>%
+  select(c('year', 'n')) %>%
+  aggregate(by = list(df_trees_hasdate_tidy$year), FUN='sum') %>%
+  ggplot(aes(x = Group.1, y = n)) + 
+  geom_line() + 
+  labs(title = 'Total Number of Planted Trees per Year', 
+       x = 'Year', y = 'Total number of planted trees') +
+  theme_minimal(base_size = 14)
+```
+
+
+# Analysis 2: Map of Recommended Tree Species 
+
+We found some interesting data from experts that analyzed the species of trees best suited for San Francisco based on criteria such as their water needs, etc. We though it would be interesting to create an interactive map to enable a non-technical audience to examine the spatial distribution of the recommended tree species in a map.
+
+[click for recommended species source](https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf): 
 
 
 ```{r}
@@ -438,12 +442,13 @@ unique(df_trees[grep(df_trees$species_nor, pattern = "Peppermint Willow", ignore
 
 ```
 
-**Species_nor** is saved as a factor. 
+*Species_nor* is saved as a factor. 
 ```{r}
 df_trees$species_nor <- as.factor(df_trees$species_nor)
 ```
 
 Recommended species are filtered.
+
 ```{r}
 df_trees_recommended <- df_trees %>% 
   filter(species_nor %in% recommended_sp) %>%
@@ -452,7 +457,7 @@ df_trees_recommended <- df_trees %>%
 
 
 <!-- to check whether all recommended species are selected -->
-```{r}
+```{r results='hide'}
 unique(df_trees_recommended$species_nor)
 ```
 
@@ -466,6 +471,7 @@ df_trees_recommended %>%
 ```
 
 Create a map with leaflet() package
+
 ```{r fig.height=12, fig.width=8}
 #map center
 mlong = -122.4446
@@ -488,66 +494,21 @@ leaflet(data = df_trees_recommended,
       addLayersControl(overlayGroups = df_trees_recommended$species_nor) ## add layers control
 ```
 
-But map is too chaotic given large number of species...sooo Shiny to the rescue:
+But map is too chaotic given large number of species...sooo Shiny to the rescue!!
 
-Create a shiny app version of the map above, with a check-box to look at each species at a time.
+we create a shiny app version of the map above, with a check-box to look at each species at a time:
 
-<<link>>
-
-## Model ##
-
-Categorize the species based on their heights
-
-```{r}
-small_trees <- c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', ' Little Gem Magnolia',
-                 ' Flowering Cherry')
-
-medium_trees <- c(' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'", ' Peppermint Willow', ' Japanese Blueberry Tree', 
-                 ' Flaxleaf Paperbark', ' Fruitless Olive', ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree')
-                    
-large_trees <- c(' Brisbane Box', ' Southern Magnolia', ' Cork Oak', ' Chilean Soapbark', ' Ginkgo: Autumn Gold', 
-                 ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo', ' Chinese Elm') 
-
-```
-
-Create a **height** column. 
-
-```{r}
-df_trees_recommended <- df_trees_recommended %>%
-  mutate(height = case_when(species_nor %in% small_trees ~ 'small', 
-                          species_nor %in% medium_trees ~ 'medium',
-                          species_nor %in% large_trees ~ 'large'))
-```
-
-Create a graph
-
-```{r}
-df_trees_recommended %>%
-  filter(age != 'NA') %>% 
-  ggplot(aes(x = age, y = dbh)) + labs(x = 'Age', y = 'Diameter at breast height') +
-  geom_point() + facet_wrap(.~height) + geom_smooth() + theme_minimal()
-
-```
-
-Predict the diameter of tree at breast height (**dbh**)
-
-```{r}
-library(mgcv)
-gam.1 <- gam(dbh ~ s(age) + height, data = df_trees_recommended)
-summary(gam.1)
-```
+<a href="https://datascienzz.shinyapps.io/rbootcamp/">CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!</a>
 
 
+# Analysis 3:Map of Rare Tree Species (n=1)
 
-# Analysis 3:
-- another map with rare (n=1) species
 
 create list of rare species (n = 1) with name matching original df_trees 
 ```{r}
 species_rare <-  df_trees_species_count%>%
   filter(n == 1) %>%
   separate(species, sep = "::", remove = FALSE, into = c('species_lat', 'species_nor'))
-
 ```
 
 Use list of rare species to subset original df_trees and also group them by common first name (i.e family name) to reduce species number
@@ -555,7 +516,6 @@ Use list of rare species to subset original df_trees and also group them by comm
 df_trees_rare <- df_trees %>%
   filter(species_nor %in% species_rare$species_nor) %>%
   separate(species_lat, sep = " ", remove = FALSE, into = c('species_first', 'species_second', 'species_third'))
-
   
 ```
 
@@ -579,12 +539,63 @@ leaflet(data = df_trees_rare,
                          lat = df_trees_rare$latitude,
                          icon = list(
                             iconUrl = 'https://icons.iconarchive.com/icons/matthew-kelleigh/mac-town-vol2/32/Tree-1-icon.png',
-                              #'https://icons.iconarchive.com/icons/pixelkit/flat-jewels/512/Tree-icon.png',
                             iconSize = c(30, 30)
                          ), 
                          popup = df_trees_rare$species_lat,
                          label = df_trees_rare$species_lat)
-                         #radius = 4,
-                         #fillOpacity = .5)
+                       
+```
+For the sake of curiosity we can look at this map to locate where each of the rarest tree species is found in San Francisco! Neat!
+
+
+
+# Analysis 4: Predicting Diameter of Tree at Breast Height
+
+In this section we run a quick and dirty gam model to give you an idea of the kind of predictive models we could build. The model tries to predict the diameter of the tree at breast height based on age and height (categorical var) of the tree.
+
+[click for heights source](https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf)
+
+We categorize the species based on their heights 
+
+
+
+```{r}
+small_trees <- c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', ' Little Gem Magnolia',
+                 ' Flowering Cherry')
+
+medium_trees <- c(' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'", ' Peppermint Willow', ' Japanese Blueberry Tree', 
+                 ' Flaxleaf Paperbark', ' Fruitless Olive', ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree')
+                    
+large_trees <- c(' Brisbane Box', ' Southern Magnolia', ' Cork Oak', ' Chilean Soapbark', ' Ginkgo: Autumn Gold', 
+                 ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo', ' Chinese Elm') 
 
 ```
+
+Create a *height* column. 
+
+```{r}
+df_trees_recommended <- df_trees_recommended %>%
+  mutate(height = case_when(species_nor %in% small_trees ~ 'small', 
+                          species_nor %in% medium_trees ~ 'medium',
+                          species_nor %in% large_trees ~ 'large'))
+```
+
+Create a graph
+
+```{r}
+df_trees_recommended %>%
+  filter(age != 'NA') %>% 
+  ggplot(aes(x = age, y = dbh)) + labs(x = 'Age', y = 'Diameter at breast height') +
+  geom_point() + facet_wrap(.~height) + geom_smooth() + theme_minimal(base_size = 14)
+
+```
+
+Predict the diameter of tree at breast height (*dbh*)
+
+```{r}
+gam.1 <- gam(dbh ~ s(age) + height, data = df_trees_recommended)
+summary(gam.1)
+```
+
+We hope this very brief sample of the type of analysis and tools we can build for your data can offer you enough of an idea of the value we can bring out of your data. We look forward to your feedback.
+
