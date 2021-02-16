@@ -395,7 +395,7 @@ df_top5_cumsum$year <- lubridate::ymd(df_top5_cumsum$year, truncated = 2L)
 ```
 
 Create the static plot
-```{r}
+```{r cache=TRUE}
 species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00')) +  
   theme_minimal(base_size = 22) 
                                                                                       
@@ -403,14 +403,14 @@ species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first,
 
 
 Create the animated plot with transition 
-```{r}
+```{r cache=TRUE}
 anim2 <- species_cumsum + transition_reveal(year) + view_follow(fixed_x = TRUE)  +
   labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum', colour = 'Top 5 Species') 
 ```
  
 Animated graph (gif version): 
 
-```{r}
+```{r cache=TRUE}
 animate(anim2, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
@@ -494,7 +494,7 @@ Create a shiny app version of the map above, with a check-box to look at each sp
 
 <<link>>
 
-## ##
+## Model ##
 
 Categorize the species based on their heights
 
