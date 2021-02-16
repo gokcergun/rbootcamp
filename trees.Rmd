@@ -5,9 +5,9 @@ author:
 - Nicolas Garzon
 date: "2/3/2021"
 output:
-  word_document: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  word_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FAL
 **The client**: The city of San Francisco 
 
 **The scenario**: The city of SF is looking to make use of a data set dating back some 50 years that has never been put to any use
-and where they have lost the overview. We are a data consultants who were given the data set to create a preliminary exploratory analyis type report as a trail with view to being hired on a longer term project with the data set.
+and where they have lost the overview. We are a data consultants who were given the data set to create a preliminary exploratory analyis type report as a trail with view to being hired on a longer term project with the [data set](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-01-28).
 
 
 Libraries that are used
@@ -418,7 +418,7 @@ animate(anim2, 200, fps = 5,  width = 1200, height = 1000,
 
 ### Analysis 2: 
 
-map of recommended species per  (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
+map of recommended species per  [Source](https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf): 
 
 
 ```{r}
