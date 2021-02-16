@@ -44,12 +44,11 @@ pal <- colorFactor('Paired', domain = recommended_sp)
 
 ##Define the UI
 ui = fluidPage(
-  titlePanel(h1("Recommended Tree Species of San Francisco", align = "right")),
-  #titlePanel( h3('NAME', align = 'right')),
+  titlePanel(h1("Recommended Tree Species of San Francisco", align = "left")),
   helpText( a("See the Source of Recommended Trees",  
-              href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf"), align='right'),
+              href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf"), align='left'),
   helpText( a("View Code",  
-              href="https://github.com/gokcergun/rbootcamp/blob/main/App.R"), align='right'),
+              href="https://github.com/gokcergun/rbootcamp/blob/main/App.R"), align='left'),
   sidebarLayout(          ##Sidebar layout with input and output definitions
     sidebarPanel(         ##Sidebar panel for input
         checkboxGroupInput(inputId = "species", #name of the input, widget
