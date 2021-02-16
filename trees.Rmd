@@ -395,21 +395,22 @@ df_top5_cumsum$year <- lubridate::ymd(df_top5_cumsum$year, truncated = 2L)
 ```
 
 Create the static plot
-```{r cache = TRUE}
-species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00')) + theme_minimal() 
+```{r}
+species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first, col=factor(species_first))) + geom_line() + scale_color_manual(values = c('#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00')) +  
+  theme_minimal(base_size = 22) 
                                                                                       
 ```
 
 
 Create the animated plot with transition 
-```{r cache = TRUE}
+```{r}
 anim2 <- species_cumsum + transition_reveal(year) + view_follow(fixed_x = TRUE)  +
-  labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum')
+  labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum', colour = 'Top 5 Species') 
 ```
-
+ 
 Animated graph (gif version): 
 
-```{r cache = TRUE}
+```{r}
 animate(anim2, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
@@ -424,15 +425,16 @@ map of recommended species per  [Source](https://sfenvironment.org/sites/default
 ```{r}
 recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', ' Flowering Cherry', 
                     ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', ' Hybrid Strawberry Tree', 
-                    ' Primrose Tree', ' Brisbane Box', ' Mediterranean Fan Palm', ' Fruitless Olive', ' Chilean Soapbark', 
-                    " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', ' Trident Maple', ' Chinese Elm', ' Cork Oak', 
-                    ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+                    ' Primrose Tree', ' Brisbane Box', ' Bronze Loquat', ' Peppermint Willow', ' Mediterranean Fan Palm', 
+                    ' Fruitless Olive', ' Chilean Soapbark', " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', 
+                    ' Trident Maple', ' Chinese Elm', ' Cork Oak', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', 
+                    ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
                     )
 ```
 
 <!-- to check the naming -->
 ```{r echo=FALSE,results='hide'}
-unique(df_trees[grep(df_trees$species_nor, pattern = "Ginkgo", ignore.case = TRUE), 'species'])
+unique(df_trees[grep(df_trees$species_nor, pattern = "Peppermint Willow", ignore.case = TRUE), 'species'])
 
 ```
 
@@ -444,7 +446,8 @@ df_trees$species_nor <- as.factor(df_trees$species_nor)
 Recommended species are filtered.
 ```{r}
 df_trees_recommended <- df_trees %>% 
-  filter(species_nor %in% recommended_sp)
+  filter(species_nor %in% recommended_sp) %>%
+  select(c("species_nor", 'latitude', "longitude", 'dbh', 'age'))
 ```
 
 
@@ -464,10 +467,6 @@ df_trees_recommended %>%
 
 Create a map with leaflet() package
 ```{r fig.height=12, fig.width=8}
-## for all species
-
-## will be added a color for each species. 
-
 #map center
 mlong = -122.4446
 mlat  = 37.72
@@ -494,6 +493,51 @@ But map is too chaotic given large number of species...sooo Shiny to the rescue:
 Create a shiny app version of the map above, with a check-box to look at each species at a time.
 
 <<link>>
+
+## ##
+
+Categorize the species based on their heights
+
+```{r}
+small_trees <- c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', ' Little Gem Magnolia',
+                 ' Flowering Cherry')
+
+medium_trees <- c(' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'", ' Peppermint Willow', ' Japanese Blueberry Tree', 
+                 ' Flaxleaf Paperbark', ' Fruitless Olive', ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree')
+                    
+large_trees <- c(' Brisbane Box', ' Southern Magnolia', ' Cork Oak', ' Chilean Soapbark', ' Ginkgo: Autumn Gold', 
+                 ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo', ' Chinese Elm') 
+
+```
+
+Create a **height** column. 
+
+```{r}
+df_trees_recommended <- df_trees_recommended %>%
+  mutate(height = case_when(species_nor %in% small_trees ~ 'small', 
+                          species_nor %in% medium_trees ~ 'medium',
+                          species_nor %in% large_trees ~ 'large'))
+```
+
+Create a graph
+
+```{r}
+df_trees_recommended %>%
+  filter(age != 'NA') %>% 
+  ggplot(aes(x = age, y = dbh)) + labs(x = 'Age', y = 'Diameter at breast height') +
+  geom_point() + facet_wrap(.~height) + geom_smooth() + theme_minimal()
+
+```
+
+Predict the diameter of tree at breast height (**dbh**)
+
+```{r}
+library(mgcv)
+gam.1 <- gam(dbh ~ s(age) + height, data = df_trees_recommended)
+summary(gam.1)
+```
+
+
 
 # Analysis 3:
 - another map with rare (n=1) species

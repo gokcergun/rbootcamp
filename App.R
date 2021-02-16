@@ -24,9 +24,10 @@ sf_trees$species_nor <- as.factor(sf_trees$species_nor)
 ##map of recommended species per  (https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf) : 
 recommended_sp <- c(' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', ' Flowering Cherry', 
                     ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', ' Hybrid Strawberry Tree', 
-                    ' Primrose Tree', ' Brisbane Box', ' Mediterranean Fan Palm', ' Fruitless Olive', ' Chilean Soapbark', 
-                    " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', ' Trident Maple', ' Chinese Elm', ' Cork Oak', 
-                    ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+                    ' Primrose Tree', ' Brisbane Box', ' Bronze Loquat', ' Peppermint Willow', ' Mediterranean Fan Palm', 
+                    ' Fruitless Olive', ' Chilean Soapbark', " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', 
+                    ' Trident Maple', ' Chinese Elm', ' Cork Oak', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', 
+                    ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
 )
 
 
@@ -52,10 +53,10 @@ ui = fluidPage(
                            label = "Choose a species:",
                            choices = c('All Species',  ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', 
                                        ' Flowering Cherry', ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', 
-                                       ' Hybrid Strawberry Tree', ' Primrose Tree', ' Brisbane Box', ' Mediterranean Fan Palm', 
-                                       ' Fruitless Olive', ' Chilean Soapbark', " Small-leaf Tristania 'Elegant'", ' Chinese Pistache', 
-                                       ' Trident Maple', ' Chinese Elm', ' Cork Oak', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', 
-                                       ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+                                       ' Hybrid Strawberry Tree', ' Primrose Tree', ' Brisbane Box', ' Bronze Loquat', ' Peppermint Willow',
+                                       ' Mediterranean Fan Palm', ' Fruitless Olive', ' Chilean Soapbark', " Small-leaf Tristania 'Elegant'", 
+                                       ' Chinese Pistache', ' Trident Maple', ' Chinese Elm', ' Cork Oak', 
+                                       ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
                            ), 
                            selected = ' Japanese Blueberry Tree'
         )),
