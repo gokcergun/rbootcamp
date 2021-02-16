@@ -47,18 +47,20 @@ ui = fluidPage(
   titlePanel("Recommended Tree Species of San Francisco"),  ##App title
   helpText( a("See the Source of Recommended Trees",  
               href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf")),
+  helpText( a("View Code",  
+              href="https://github.com/gokcergun/rbootcamp/blob/main/App.R")),
   sidebarLayout(          ##Sidebar layout with input and output definitions
     sidebarPanel(         ##Sidebar panel for input
         checkboxGroupInput(inputId = "species", #name of the input, widget
                            label = "Choose a species:",
-                           choices = c('All Species',  ' Japanese Blueberry Tree', ' Flaxleaf Paperbark', ' Red Flowering Gum', 
-                                       ' Flowering Cherry', ' Little Gem Magnolia', ' Southern Magnolia', ' Weeping Bottlebrush', 
-                                       ' Hybrid Strawberry Tree', ' Primrose Tree', ' Brisbane Box', ' Bronze Loquat', ' Peppermint Willow',
-                                       ' Mediterranean Fan Palm', ' Fruitless Olive', ' Chilean Soapbark', " Small-leaf Tristania 'Elegant'", 
-                                       ' Chinese Pistache', ' Trident Maple', ' Chinese Elm', ' Cork Oak', 
-                                       ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', ' Autumn Sentinel Ginkgo'
+                           choices = c('All Species', ' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', 
+                                       ' Little Gem Magnolia', ' Flowering Cherry', ' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'",
+                                       ' Peppermint Willow', ' Japanese Blueberry Tree',' Flaxleaf Paperbark', ' Fruitless Olive', 
+                                       ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree', ' Brisbane Box', ' Southern Magnolia', ' Cork Oak', 
+                                       ' Chilean Soapbark', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', 
+                                       ' Autumn Sentinel Ginkgo', ' Chinese Elm'
                            ), 
-                           selected = ' Japanese Blueberry Tree'
+                           selected = ' Little Gem Magnolia'
         )),
     
     mainPanel(             ##Main panel for displaying outputs
