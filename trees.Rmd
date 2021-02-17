@@ -391,14 +391,14 @@ species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first,
 
 
 Create the animated plot with transition 
-```{r}
+```{r cache=TRUE}
 anim2 <- species_cumsum + transition_reveal(year) + view_follow(fixed_x = TRUE)  +
   labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum', colour = 'Top 5 Species') 
 ```
  
 Animated graph (gif version): 
 
-```{r}
+```{r cache=TRUE}
 animate(anim2, 200, fps = 5,  width = 1200, height = 800, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
@@ -472,7 +472,7 @@ df_trees_recommended %>%
 
 Create a map with leaflet() package
 
-```{r fig.height=12, fig.width=8}
+```{r fig.height=12, fig.width=8, cache=TRUE}
 #map center
 mlong = -122.4446
 mlat  = 37.72
@@ -496,9 +496,10 @@ leaflet(data = df_trees_recommended,
 
 But map is too chaotic given large number of species...sooo Shiny to the rescue!!
 
+### Shiny App
 we create a shiny app version of the map above, with a check-box to look at each species at a time:
 
-<a href="https://datascienzz.shinyapps.io/rbootcamp/">CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!</a>
+<a href="https://datascienzz.shinyapps.io/rbootcamp/">**CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!**</a>
 
 
 # Analysis 3:Map of Rare Tree Species (n=1)
@@ -521,7 +522,7 @@ df_trees_rare <- df_trees %>%
 
 
 Plot map using leaflet, to create a hover-over dot pop up with species name, given not enough colors to differentiate so many species
-```{r}
+```{r cache=TRUE}
 #map center
 mlong = -122.4446
 mlat  = 37.72
