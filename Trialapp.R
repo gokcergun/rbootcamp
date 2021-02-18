@@ -62,23 +62,21 @@ pal <- colorFactor('Paired', domain = recommended_sp)
 
 
 ##Define the UI
+
 ui = fluidPage(
-  titlePanel(h1("Recommended Tree Species of San Francisco", align = "right")),
+  titlePanel(h1("Recommended Tree Species of San Francisco", align = "left")),
   #titlePanel( h3('NAME', align = 'right')),
   helpText( a("See the Source of Recommended Trees",  
-              href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf"), align='right'),
+              href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf"), align='left'),
   helpText( a("View Code",  
-              href="https://github.com/gokcergun/rbootcamp/blob/main/App.R"), align='right'),
+              href="https://github.com/gokcergun/rbootcamp/blob/main/App.R"), align='left'),
   sidebarLayout(          ##Sidebar layout with input and output definitions
     sidebarPanel(         ##Sidebar panel for input
       checkboxGroupInput(inputId = "height", #name of the input, widget
                          label = "Choose a height:",
                          choices = c('All Species', 'Small', 'Medium', "Large")
-                         ), 
-                         selected = 'Small'
-      ,
-      
-      
+      ), 
+ 
       checkboxGroupInput(inputId = "species", #name of the input, widget
                          label = "Choose a species:",
                          choices = c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', 
@@ -91,7 +89,7 @@ ui = fluidPage(
                          selected = ' Little Gem Magnolia'
                          
       ))
-  ,
+    ,
     
     mainPanel(           ##Main panel for displaying outputs
       
@@ -101,10 +99,8 @@ ui = fluidPage(
       
       
       leafletOutput("map", height = 800)    ##Output: interactive leaflet map
-      
     )
-))
-
+  ))
 
 server = function(input, output, session) {    ##Define the server
   
@@ -114,50 +110,29 @@ server = function(input, output, session) {    ##Define the server
     
     # Can use character(0) to remove all choices
     if (is.null(x)){
-      updateCheckboxGroupInput(session, "species",
-                               # label = paste("Checkboxgroup label", length(x)),
-                               choices = c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', 
-                                           ' Little Gem Magnolia', ' Flowering Cherry', ' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'",
-                                           ' Peppermint Willow', ' Japanese Blueberry Tree',' Flaxleaf Paperbark', ' Fruitless Olive', 
-                                           ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree', ' Brisbane Box', ' Southern Magnolia', ' Cork Oak', 
-                                           ' Chilean Soapbark', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', 
-                                           ' Autumn Sentinel Ginkgo', ' Chinese Elm'
-                               ), 
-                               selected = ' Little Gem Magnolia'
-      )
-    } else {
-      (if input$height == 'All Species'){
-        updateCheckboxGroupInput(session, "species",
-        choices = c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', 
-                    ' Little Gem Magnolia', ' Flowering Cherry', ' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'",
-                    ' Peppermint Willow', ' Japanese Blueberry Tree',' Flaxleaf Paperbark', ' Fruitless Olive', 
-                    ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree', ' Brisbane Box', ' Southern Magnolia', ' Cork Oak', 
-                    ' Chilean Soapbark', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', 
-                    ' Autumn Sentinel Ginkgo', ' Chinese Elm'
-        ), 
-        selected = c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', 
-                     ' Little Gem Magnolia', ' Flowering Cherry', ' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'",
-                     ' Peppermint Willow', ' Japanese Blueberry Tree',' Flaxleaf Paperbark', ' Fruitless Olive', 
-                     ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree', ' Brisbane Box', ' Southern Magnolia', ' Cork Oak', 
-                     ' Chilean Soapbark', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', 
-                     ' Autumn Sentinel Ginkgo', ' Chinese Elm'
-        ))
-      } else { 
-        (if x == 'Small'){
-          updateCheckboxGroupInput(session, "species", choices = small_trees, selected = small_trees)
-      } else {
-        (if x == 'Medium'){
-            updateCheckboxGroupInput(session, "species", choices = medium_trees, selected = medium_trees)
-          } else {
-          (if x == 'Large'){
-              updateCheckboxGroupInput(session, "species", choices = large_trees, selected = large_trees)
-        }
+      updateCheckboxGroupInput(session, "species", selected = ' Little Gem Magnolia')
+     } else if (x == 'All Species'){
+        updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = recommended_sp)
+      } else if (x == 'Small'){ 
+          updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = small_trees)
+      } else if (x == 'Medium'){
+          updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = medium_trees)
+      } else if (x == 'Large'){
+          updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = large_trees)
+      } else if (x == 'Small' & x == 'Medium'){ 
+        updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = c(small_trees, medium_trees))
+      } else if (x == 'Small' & x == 'Medium' & x == 'Large'){ 
+        updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = recommended_sp)
+      } else if (x == 'Small' & x == 'Larger'){ 
+        updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = c(small_trees, large_trees))
+      } else if (x == 'Large' & x == 'Medium'){ 
+          updateCheckboxGroupInput(session, "species", choices = recommended_sp, selected = c(large_trees, medium_trees))
         
-      }
-    }
-      }
-    }
-  }),
+            }
+    
+  
+    
+    })
   
   filteredData <- reactive({
     if (input$height == "All Species") {
@@ -191,4 +166,59 @@ server = function(input, output, session) {    ##Define the server
 shinyApp(ui, server)
 
 
+# choiceNames = list(HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#A6CEE3;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#1F78B4;margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#B2DF8A;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#33A02C;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:"#FB9A99";margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#E31A1C;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#FDBF6F;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#FF7F00;margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#CAB2D6;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#6A3D9A;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#FFFF99;margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#B15928;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#A6CEE3;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#1F78B4;margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#B2DF8A;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#33A02C;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:"#FB9A99";margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#E31A1C;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#FDBF6F;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#FF7F00;margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#CAB2D6;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#6A3D9A;margin-top:3px;"></i><div style="color:black;padding:5px;">1</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#FFFF99;margin-top:3px;"></i><div style="color:black;padding:5px;">2</div></div>'),
+#                    HTML('<div style="display:flex"><i class="fa fa-circle"
+#                                          style="color:#B15928;margin-top:3px;"></i><div style="color:black;padding:5px;">3</div></div>')), 
+# 
+# choiceValues =   c(' Trident Maple', ' Weeping Bottlebrush', ' Mediterranean Fan Palm', ' Bronze Loquat', 
+#                    ' Little Gem Magnolia', ' Flowering Cherry', ' Hybrid Strawberry Tree', " Small-leaf Tristania 'Elegant'",
+#                    ' Peppermint Willow', ' Japanese Blueberry Tree',' Flaxleaf Paperbark', ' Fruitless Olive', 
+#                    ' Chinese Pistache', ' Red Flowering Gum', ' Primrose Tree', ' Brisbane Box', ' Southern Magnolia', ' Cork Oak', 
+#                    ' Chilean Soapbark', ' Ginkgo: Autumn Gold', ' Fairmont Ginkgo', ' Ginkgo: Saratoga', 
+#                    ' Autumn Sentinel Ginkgo', ' Chinese Elm')
 
