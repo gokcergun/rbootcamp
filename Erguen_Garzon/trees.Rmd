@@ -19,24 +19,24 @@ and where they have lost the overview. We are data consultants who were given th
 
 Libraries that are used
 ```{r}
-#install.packages('dplyr')
+# install.packages('dplyr')
 library(dplyr)
-#install.packages('lubridate')
+# install.packages('lubridate')
 library(lubridate)
-#install.packages('tidyr')
+# install.packages('tidyr')
 library(tidyr)
-#install.packages('ggplot2')
+# install.packages('ggplot2')
 library(ggplot2)
 library(tidyverse)
-#install.packages('gganimate')
+# install.packages('gganimate')
 library(gganimate)
-#install.packages('gifski')
+# install.packages('gifski')
 library(gifski)
-#install.packages('av')
+# install.packages('av')
 library(av)
-#install.packages('shiny')
+# install.packages('shiny')
 library(shiny)
-#install.packages('leaflet')
+# install.packages('leaflet')
 library(leaflet)
 library(mgcv)
 ```
@@ -497,7 +497,7 @@ But map is too chaotic given large number of species...sooo Shiny to the rescue!
 ### Shiny App
 We create a shiny app version of the map above, with a check-box to look at each species at a time:
 
-<a href="https://datascienzz.shinyapps.io/rbootcamp/">**CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!**</a>
+<a href="https://datascienzz.shinyapps.io/erguen_garzon/">**CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!**</a>
 
 
 # Analysis 3:Map of Rare Tree Species (n=1)
