@@ -82,7 +82,7 @@ for (i in 1:12){
 str(df_trees)
 ``` 
 
-**Date** column has character data type. We change it to date. 
+*Date* column has character data type. We change it to date. 
 ```{r}
 # df_trees$date <- as.Date(df_trees$date,format="%Y-%m-%d") #using base r
 
@@ -103,7 +103,7 @@ head(unique(df_trees$species))
 
 ```
 
-we see that for each **species**, the species column reports both the latin and common names. For future analysis, it might be more 
+we see that for each *species*, the species column reports both the latin and common names. For future analysis, it might be more 
 convenient to split the latin and common names into respective columns. 
 
 Separate the species column into latin and common name columns.
@@ -126,7 +126,7 @@ for (col in colnames(df_trees)){
 }
 ```
 
-Column with most significant amount of missing data is the **date** column.
+Column with most significant amount of missing data is the *date* column.
 
 We see almost every species has missing values (517 out of 571 species) so there is at least no clear indication that the data is missing not at random.
 ```{r}
@@ -152,7 +152,7 @@ df_trees_merge %>%
 ```
 
 
-We look at the total number of observations we would lose if we drop species where missing 100% of date information. And the number is very small relative to total number of observations (n = 192987) 
+We look at the total number of observations we would lose if we drop species where missing 100% of date information. And the number is very small relative to total number of observations (n = 68377, total number of obersvation with a date information) 
 
 ```{r}
 df_trees_merge %>% filter(percent.missing==1) %>% select(ntotal) %>%
@@ -193,7 +193,7 @@ df_trees %>%
   
 ```
 
-lets visualize the information above, but this time with age instead of date.  
+Lets visualize the information above, but this time with age instead of date.  
 NOTE: We create a new column that shows age using the year column to calculate it using the more modern approach mutate().
 
 ```{r}
@@ -401,7 +401,7 @@ animate(anim2, 200, fps = 5,  width = 1200, height = 800,
         renderer = gifski_renderer("gganim2.gif"))
 ```
 
-we see a pattern that when each of the top 5 species is first introduced their rate of increase is very high (steep slope), and after some time all of slopes start to flatten, with Prunus flattening at a significantly slower rate than the other 4. 
+We see a pattern that when each of the top 5 species is first introduced their rate of increase is very high (steep slope), and after some time all of slopes start to flatten, with Prunus flattening at a significantly slower rate than the other 4. 
 
 As a bit of side note we look at the total number of planted trees per year regardless of species to get a sense of overall tree planting
 
@@ -495,7 +495,7 @@ leaflet(data = df_trees_recommended,
 But map is too chaotic given large number of species...sooo Shiny to the rescue!!
 
 ### Shiny App
-we create a shiny app version of the map above, with a check-box to look at each species at a time:
+We create a shiny app version of the map above, with a check-box to look at each species at a time:
 
 <a href="https://datascienzz.shinyapps.io/rbootcamp/">**CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!**</a>
 
