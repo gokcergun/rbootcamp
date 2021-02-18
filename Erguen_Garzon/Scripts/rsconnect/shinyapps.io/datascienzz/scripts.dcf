@@ -1,0 +1,10 @@
+name: scripts
+title:
+username:
+account: datascienzz
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3657406
+bundleId: 4240491
+url: https://datascienzz.shinyapps.io/scripts/
+when: 1613648767.01946

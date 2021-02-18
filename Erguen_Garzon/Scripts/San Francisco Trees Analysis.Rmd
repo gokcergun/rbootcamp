@@ -152,7 +152,7 @@ df_trees_merge %>%
 ```
 
 
-We look at the total number of observations we would lose if we drop species where missing 100% of date information. And the number is very small relative to total number of observations (n = 68377, total number of obersvation with a date information) 
+We look at the total number of observations we would lose if we drop species where missing 100% of date information. And the number is very small relative to total number of observations (n = 68377, total number of observation with a date information) 
 
 ```{r}
 df_trees_merge %>% filter(percent.missing==1) %>% select(ntotal) %>%
@@ -497,7 +497,7 @@ But map is too chaotic given large number of species...sooo Shiny to the rescue!
 ### Shiny App
 We create a shiny app version of the map above, with a check-box to look at each species at a time:
 
-<a href="https://datascienzz.shinyapps.io/erguen_garzon/">**CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!**</a>
+<a href="https://datascienzz.shinyapps.io/scripts/">**CLICK HERE FOR IMPROVED INTERACTIVE MAP!!!**</a>
 
 
 # Analysis 3:Map of Rare Tree Species (n=1)
