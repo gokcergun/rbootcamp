@@ -300,7 +300,7 @@ df_trees_hasdate_formated <- df_trees_hasdate_tidy %>% subset(species_first != '
 
 In this step, we will create individual static graphs for each year. 
 
-```{r cache = TRUE}
+```{r}
 staticplot = ggplot(df_trees_hasdate_formated, aes(rank, group = species_first, 
                 fill = as.factor(species_first), color = as.factor(species_first))) +
   geom_tile(aes(y = n/2,
@@ -333,7 +333,7 @@ staticplot = ggplot(df_trees_hasdate_formated, aes(rank, group = species_first,
 ```
 
 
-```{r cache=TRUE}
+```{r}
 anim = staticplot + transition_states(year, transition_length = 4, state_length = 1) +
   view_follow(fixed_x = TRUE)  +
   labs(title = 'Total Number of Planted Trees per Year: {closest_state}',  
@@ -341,7 +341,7 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
 ```
   
 For gif
-```{r cache = TRUE}
+```{r }
 animate(anim, 200, fps = 2,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim.gif"))
 
@@ -389,14 +389,14 @@ species_cumsum <- ggplot(df_top5_cumsum, aes(x=year,y=csum, group=species_first,
 
 
 Create the animated plot with transition 
-```{r cache=TRUE}
+```{r}
 anim2 <- species_cumsum + transition_reveal(year) + view_follow(fixed_x = TRUE)  +
   labs(title = 'Cumulative Total of Top 5 Species over Time', x = 'Year', y = 'Cumulative Sum', colour = 'Top 5 Species') 
 ```
  
 Animated graph (gif version): 
 
-```{r cache=TRUE}
+```{r}
 animate(anim2, 200, fps = 5,  width = 1200, height = 800, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
@@ -470,7 +470,7 @@ df_trees_recommended %>%
 
 Create a map with leaflet() package
 
-```{r fig.height=12, fig.width=8, cache=TRUE}
+```{r fig.height=12, fig.width=8}
 #map center
 mlong = -122.4446
 mlat  = 37.72
@@ -520,7 +520,7 @@ df_trees_rare <- df_trees %>%
 
 
 Plot map using leaflet, to create a hover-over dot pop up with species name, given not enough colors to differentiate so many species
-```{r cache=TRUE}
+```{r}
 #map center
 mlong = -122.4446
 mlat  = 37.72
