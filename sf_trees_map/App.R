@@ -69,7 +69,7 @@ ui = fluidPage(
   helpText( a("See the Source of Recommended Trees",  
               href="https://sfenvironment.org/sites/default/files/fliers/files/sf_tree_guide.pdf"), align='left'),
   helpText( a("View Code",  
-              href="https://github.com/gokcergun/rbootcamp/sf_trees_map/App.R"), align='left'),
+              href="https://github.com/gokcergun/rbootcamp/blob/main/sf_trees_map/App.R"), align='left'),
   sidebarLayout(          ##Sidebar layout with input and output definitions
     sidebarPanel(         ##Sidebar panel for input
       radioButtons(inputId = "height", #name of the input, widget
